@@ -5,7 +5,7 @@ import {
   Group,
   Line,
   Text,
-  Arc,
+  // Arc,
   Path,
   Circle,
 } from "react-konva";
@@ -264,43 +264,6 @@ const PadeyeSide = ({
                   x={cx * scale - 30}
                   y={(annLabelY + 5) * scale}
                   fontSize={11}
-                  fill="#d97706"
-                />
-
-                {/* Shackle Clearance Left Annotation */}
-                <Line
-                  points={[
-                    params.cheekThk * scale,
-                    (cheekOffsetY + cheekHeight) * scale,
-                    params.cheekThk * scale,
-                    (annLabelY + 5) * scale,
-                  ]}
-                  stroke="#f59e0b"
-                  strokeWidth={1}
-                  dash={[2, 2]}
-                />
-                <Line
-                  points={[
-                    (cx - params.shackleA! / 2) * scale,
-                    annLabelY * scale,
-                    params.cheekThk * scale,
-                    annLabelY * scale,
-                  ]}
-                  stroke="#f59e0b"
-                  strokeWidth={1}
-                  pointerLength={3}
-                  pointerWidth={3}
-                  lineCap="round"
-                />
-                <Text
-                  text={`${(0.5 * (params.shackleA! - params.mainThk - 2 * params.cheekThk)).toFixed(1)}`}
-                  x={
-                    ((cx - params.shackleA! / 2 + params.cheekThk) / 2) *
-                      scale -
-                    10
-                  }
-                  y={(annLabelY + 5) * scale}
-                  fontSize={10}
                   fill="#d97706"
                 />
 
