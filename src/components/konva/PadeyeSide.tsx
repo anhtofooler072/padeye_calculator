@@ -1,50 +1,56 @@
 import { useState } from "react";
-import { Stage, Layer, Rect, Group, Line, Text, Arrow } from "react-konva";
+import { Stage, Layer, Rect, Group, Line, Text } from "react-konva";
 
 const PadeyeSide = () => {
   const [params, setParams] = useState({
+    mainDia: 180, // Main plate diameter
+    cheekDia: 70, // Cheek plate diameter
+    baseHeight: 120, // Base height
     mainThk: 30, // Main plate thickness
-    mainHeight: 200, // Total height of the main plate visible
     cheekThk: 20, // Cheek plate thickness
-    cheekHeight: 100, // Cheek plate height (diameter)
   });
 
   const [draftParams, setDraftParams] = useState({
+    mainDia: "180",
+    cheekDia: "70",
+    baseHeight: "120",
     mainThk: "30",
-    mainHeight: "200",
     cheekThk: "20",
-    cheekHeight: "100",
   });
 
   const handleGenerate = () => {
+    const newMainDia = Number(draftParams.mainDia) || 180;
+    const newCheekDia = Number(draftParams.cheekDia) || 70;
+    const newBaseHeight = Number(draftParams.baseHeight) || 120;
     const newMainThk = Number(draftParams.mainThk) || 30;
-    const newMainHeight = Number(draftParams.mainHeight) || 200;
     const newCheekThk = Number(draftParams.cheekThk) || 20;
-    let newCheekHeight = Number(draftParams.cheekHeight) || 100;
-
-    // Apply basic visual constraints
-    newCheekHeight = Math.min(newCheekHeight, newMainHeight);
 
     setParams({
+      mainDia: newMainDia,
+      cheekDia: newCheekDia,
+      baseHeight: newBaseHeight,
       mainThk: newMainThk,
-      mainHeight: newMainHeight,
       cheekThk: newCheekThk,
-      cheekHeight: newCheekHeight,
     });
 
     setDraftParams({
+      mainDia: newMainDia.toString(),
+      cheekDia: newCheekDia.toString(),
+      baseHeight: newBaseHeight.toString(),
       mainThk: newMainThk.toString(),
-      mainHeight: newMainHeight.toString(),
       cheekThk: newCheekThk.toString(),
-      cheekHeight: newCheekHeight.toString(),
     });
   };
 
-  const PAD_CANVAS = 350; // px
+  const PAD_CANVAS = 400; // px
+
+  // Derived dimensions
+  const mainHeight = params.baseHeight + params.mainDia / 2;
+  const cheekHeight = params.cheekDia;
 
   // Calculate actual bounding dimensions
   const totalDrawingWidth = params.cheekThk * 2 + params.mainThk;
-  const totalDrawingHeight = params.mainHeight;
+  const totalDrawingHeight = mainHeight;
 
   // Leave some padding around the drawing (e.g., 60% of canvas size)
   const maxDrawingSize = PAD_CANVAS * 0.6;
@@ -59,11 +65,12 @@ const PadeyeSide = () => {
 
   // Center the drawing completely in the canvas
   const offsetX = (PAD_CANVAS - scaledWidth) / 2;
-  const offsetY = (PAD_CANVAS - scaledHeight) / 2;
+  const offsetY = (PAD_CANVAS - scaledHeight) / 2 + 25; // Shift down slightly for top dimension lines
 
-  // Cheek plates are typicaly placed near the top/hole.
-  // We'll offset them a bit from the top.
-  const cheekOffsetY = (params.mainHeight - params.cheekHeight) * 0.25;
+  // Center of padding hole from top of main plate is radius = mainDia / 2
+  const holeCenterY = params.mainDia / 2;
+  // Cheek plates are centered on the hole
+  const cheekOffsetY = holeCenterY - cheekHeight / 2;
 
   return (
     <div className="flex h-screen bg-slate-100">
@@ -72,6 +79,66 @@ const PadeyeSide = () => {
         <h1 className="font-bold text-lg text-slate-800">
           Side View Generator
         </h1>
+
+        {/* Main Plate Diameter Input */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+            Main Plate Dia
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              value={draftParams.mainDia}
+              onChange={(e) =>
+                setDraftParams({ ...draftParams, mainDia: e.target.value })
+              }
+              className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 transition-shadow"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
+              mm
+            </span>
+          </div>
+        </div>
+
+        {/* Cheek Plate Diameter Input */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+            Cheek Plate Dia
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              value={draftParams.cheekDia}
+              onChange={(e) =>
+                setDraftParams({ ...draftParams, cheekDia: e.target.value })
+              }
+              className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 transition-shadow"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
+              mm
+            </span>
+          </div>
+        </div>
+
+        {/* Base Height Input */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+            Base Height
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              value={draftParams.baseHeight}
+              onChange={(e) =>
+                setDraftParams({ ...draftParams, baseHeight: e.target.value })
+              }
+              className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 transition-shadow"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
+              mm
+            </span>
+          </div>
+        </div>
 
         {/* Main Plate Thickness Input */}
         <div className="flex flex-col gap-1.5">
@@ -93,26 +160,6 @@ const PadeyeSide = () => {
           </div>
         </div>
 
-        {/* Main Plate Height Input */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">
-            Main Plate Height
-          </label>
-          <div className="relative">
-            <input
-              type="number"
-              value={draftParams.mainHeight}
-              onChange={(e) =>
-                setDraftParams({ ...draftParams, mainHeight: e.target.value })
-              }
-              className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 transition-shadow"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
-              mm
-            </span>
-          </div>
-        </div>
-
         {/* Cheek Plate Thickness Input */}
         <div className="flex flex-col gap-1.5">
           <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">
@@ -124,26 +171,6 @@ const PadeyeSide = () => {
               value={draftParams.cheekThk}
               onChange={(e) =>
                 setDraftParams({ ...draftParams, cheekThk: e.target.value })
-              }
-              className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 transition-shadow"
-            />
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
-              mm
-            </span>
-          </div>
-        </div>
-
-        {/* Cheek Plate Height Input */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">
-            Cheek Plate Height
-          </label>
-          <div className="relative">
-            <input
-              type="number"
-              value={draftParams.cheekHeight}
-              onChange={(e) =>
-                setDraftParams({ ...draftParams, cheekHeight: e.target.value })
               }
               className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 transition-shadow"
             />
@@ -175,7 +202,7 @@ const PadeyeSide = () => {
                   x={0}
                   y={cheekOffsetY * scale}
                   width={params.cheekThk * scale}
-                  height={params.cheekHeight * scale}
+                  height={cheekHeight * scale}
                   stroke="#334155"
                   strokeWidth={2}
                   fill="#bbf7d0" // Light green
@@ -186,7 +213,7 @@ const PadeyeSide = () => {
                   x={params.cheekThk * scale}
                   y={0}
                   width={params.mainThk * scale}
-                  height={params.mainHeight * scale}
+                  height={mainHeight * scale}
                   stroke="#334155"
                   strokeWidth={2}
                   fill="#fecdd3" // Light red / pinkish
@@ -197,68 +224,158 @@ const PadeyeSide = () => {
                   x={(params.cheekThk + params.mainThk) * scale}
                   y={cheekOffsetY * scale}
                   width={params.cheekThk * scale}
-                  height={params.cheekHeight * scale}
+                  height={cheekHeight * scale}
                   stroke="#334155"
                   strokeWidth={2}
                   fill="#bbf7d0" // Light green
                 />
 
+                {/* --- Center Line (Pin Hole Axis) --- */}
+                <Line
+                  points={[
+                    -30,
+                    holeCenterY * scale,
+                    totalDrawingWidth * scale + 30,
+                    holeCenterY * scale,
+                  ]}
+                  stroke="#94a3b8"
+                  strokeWidth={1.5}
+                  dash={[20, 6, 4, 6]}
+                />
+
                 {/* --- Main Plate Annotation --- */}
-                <Group>
-                  <Arrow
-                    points={[
-                      (params.cheekThk + params.mainThk / 2) * scale - 30,
-                      -30,
-                      (params.cheekThk + params.mainThk / 2) * scale,
-                      0,
-                    ]}
-                    stroke="#64748b"
-                    strokeWidth={1}
-                    fill="#64748b"
-                    pointerLength={6}
-                    pointerWidth={6}
-                  />
-                  <Text
-                    text={`Main Plate (${params.mainThk}mm)`}
-                    x={(params.cheekThk + params.mainThk / 2) * scale - 120}
-                    y={-40}
-                    fontSize={12}
-                    fill="#64748b"
-                  />
-                </Group>
+                {/* Extension lines */}
+                <Line
+                  points={[
+                    params.cheekThk * scale,
+                    0,
+                    params.cheekThk * scale,
+                    -25,
+                  ]}
+                  stroke="#0ea5e9"
+                  strokeWidth={1}
+                  dash={[4, 4]}
+                />
+                <Line
+                  points={[
+                    (params.cheekThk + params.mainThk) * scale,
+                    0,
+                    (params.cheekThk + params.mainThk) * scale,
+                    -25,
+                  ]}
+                  stroke="#0ea5e9"
+                  strokeWidth={1}
+                  dash={[4, 4]}
+                />
+                <Line
+                  points={[
+                    params.cheekThk * scale,
+                    -20,
+                    (params.cheekThk + params.mainThk) * scale,
+                    -20,
+                  ]}
+                  stroke="#0ea5e9"
+                  strokeWidth={1}
+                  lineCap="round"
+                />
+                <Line
+                  points={[
+                    params.cheekThk * scale,
+                    -24,
+                    params.cheekThk * scale,
+                    -16,
+                  ]}
+                  stroke="#0ea5e9"
+                  strokeWidth={1}
+                />
+                <Line
+                  points={[
+                    (params.cheekThk + params.mainThk) * scale,
+                    -24,
+                    (params.cheekThk + params.mainThk) * scale,
+                    -16,
+                  ]}
+                  stroke="#0ea5e9"
+                  strokeWidth={1}
+                />
+                <Text
+                  text={`${params.mainThk} mm`}
+                  x={(params.cheekThk + params.mainThk / 2) * scale - 20}
+                  y={-35}
+                  fontSize={12}
+                  fill="#0ea5e9"
+                />
 
                 {/* --- Cheek Plate Annotation --- */}
-                <Group>
-                  <Arrow
-                    points={[
-                      (params.cheekThk * 2 + params.mainThk) * scale + 50,
-                      cheekOffsetY * scale - 20,
-                      (params.cheekThk + params.mainThk + params.cheekThk / 2) *
-                        scale,
-                      cheekOffsetY * scale,
-                    ]}
-                    stroke="#64748b"
-                    strokeWidth={1}
-                    fill="#64748b"
-                    pointerLength={6}
-                    pointerWidth={6}
-                  />
-                  <Text
-                    text={`Cheek Plate (${params.cheekThk}mm)`}
-                    x={(params.cheekThk * 2 + params.mainThk) * scale + 55}
-                    y={cheekOffsetY * scale - 30}
-                    fontSize={12}
-                    fill="#64748b"
-                  />
-                </Group>
+                {/* Extension lines */}
+                <Line
+                  points={[
+                    (params.cheekThk + params.mainThk) * scale,
+                    cheekOffsetY * scale,
+                    (params.cheekThk + params.mainThk) * scale,
+                    -50,
+                  ]}
+                  stroke="#0ea5e9"
+                  strokeWidth={1}
+                  dash={[4, 4]}
+                />
+                <Line
+                  points={[
+                    (params.cheekThk * 2 + params.mainThk) * scale,
+                    cheekOffsetY * scale,
+                    (params.cheekThk * 2 + params.mainThk) * scale,
+                    -50,
+                  ]}
+                  stroke="#0ea5e9"
+                  strokeWidth={1}
+                  dash={[4, 4]}
+                />
+                <Line
+                  points={[
+                    (params.cheekThk * 2 + params.mainThk) * scale,
+                    -45,
+                    (params.cheekThk + params.mainThk) * scale,
+                    -45,
+                  ]}
+                  stroke="#0ea5e9"
+                  strokeWidth={1}
+                  lineCap="round"
+                />
+                <Line
+                  points={[
+                    (params.cheekThk + params.mainThk) * scale,
+                    -49,
+                    (params.cheekThk + params.mainThk) * scale,
+                    -41,
+                  ]}
+                  stroke="#0ea5e9"
+                  strokeWidth={1}
+                />
+                <Line
+                  points={[
+                    (params.cheekThk * 2 + params.mainThk) * scale,
+                    -49,
+                    (params.cheekThk * 2 + params.mainThk) * scale,
+                    -41,
+                  ]}
+                  stroke="#0ea5e9"
+                  strokeWidth={1}
+                />
+                <Text
+                  text={`${params.cheekThk} mm`}
+                  x={(params.cheekThk * 1.5 + params.mainThk) * scale - 20}
+                  y={-60}
+                  fontSize={12}
+                  fill="#0ea5e9"
+                />
 
                 {/* Full Width Line Annotation */}
                 <Line
                   points={[
                     0,
-                    params.mainHeight * scale + 20,
+                    mainHeight * scale + 20,
                     totalDrawingWidth * scale,
-                    params.mainHeight * scale + 20,
+                    mainHeight * scale + 20,
                   ]}
                   stroke="#0ea5e9"
                   strokeWidth={1}
@@ -269,9 +386,9 @@ const PadeyeSide = () => {
                 <Line
                   points={[
                     0,
-                    params.mainHeight * scale + 16,
+                    mainHeight * scale + 16,
                     0,
-                    params.mainHeight * scale + 24,
+                    mainHeight * scale + 24,
                   ]}
                   stroke="#0ea5e9"
                   strokeWidth={1}
@@ -279,9 +396,9 @@ const PadeyeSide = () => {
                 <Line
                   points={[
                     totalDrawingWidth * scale,
-                    params.mainHeight * scale + 16,
+                    mainHeight * scale + 16,
                     totalDrawingWidth * scale,
-                    params.mainHeight * scale + 24,
+                    mainHeight * scale + 24,
                   ]}
                   stroke="#0ea5e9"
                   strokeWidth={1}
@@ -289,7 +406,7 @@ const PadeyeSide = () => {
                 <Text
                   text={`Total Thickness: ${totalDrawingWidth} mm`}
                   x={(totalDrawingWidth * scale) / 2 - 50}
-                  y={params.mainHeight * scale + 25}
+                  y={mainHeight * scale + 25}
                   fontSize={12}
                   fill="#0ea5e9"
                 />
