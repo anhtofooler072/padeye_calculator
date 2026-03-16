@@ -1,0 +1,212 @@
+[
+  {
+    "id": "19.05",
+    "name": "3/4 in — 19.05 mm",
+    "diameter": 19.05,
+    "swl": null,
+    "type": "inch"
+  },
+  {
+    "id": "22.225",
+    "name": "7/8 in — 22.225 mm",
+    "diameter": 22.225,
+    "swl": null,
+    "type": "inch"
+  },
+  {
+    "id": "25.4",
+    "name": "1 in — 25.4 mm",
+    "diameter": 25.4,
+    "swl": null,
+    "type": "inch"
+  },
+  {
+    "id": "28.575",
+    "name": "1 1/8 in — 28.575 mm",
+    "diameter": 28.575,
+    "swl": null,
+    "type": "inch"
+  },
+  {
+    "id": "31.75",
+    "name": "1 1/4 in — 31.75 mm",
+    "diameter": 31.75,
+    "swl": null,
+    "type": "inch"
+  },
+  {
+    "id": "34.925",
+    "name": "1 3/8 in — 34.925 mm",
+    "diameter": 34.925,
+    "swl": null,
+    "type": "inch"
+  },
+  {
+    "id": "38.1",
+    "name": "1 1/2 in — 38.1 mm",
+    "diameter": 38.1,
+    "swl": null,
+    "type": "inch"
+  },
+  {
+    "id": "24",
+    "name": "Ø 24 mm",
+    "diameter": 24,
+    "swl": 3.35,
+    "type": "metric"
+  },
+  {
+    "id": "27",
+    "name": "Ø 27 mm",
+    "diameter": 27,
+    "swl": 4.25,
+    "type": "metric"
+  },
+  {
+    "id": "30",
+    "name": "Ø 30 mm",
+    "diameter": 30,
+    "swl": 5.5,
+    "type": "metric"
+  },
+  {
+    "id": "33",
+    "name": "Ø 33 mm",
+    "diameter": 33,
+    "swl": 7.0,
+    "type": "metric"
+  },
+  {
+    "id": "36",
+    "name": "Ø 36 mm",
+    "diameter": 36,
+    "swl": 8.0,
+    "type": "metric"
+  },
+  {
+    "id": "39",
+    "name": "Ø 39 mm",
+    "diameter": 39,
+    "swl": 9.5,
+    "type": "metric"
+  },
+  {
+    "id": "42",
+    "name": "Ø 42 mm",
+    "diameter": 42,
+    "swl": 11.0,
+    "type": "metric"
+  },
+  {
+    "id": "48",
+    "name": "Ø 48 mm",
+    "diameter": 48,
+    "swl": 14.5,
+    "type": "metric"
+  },
+  {
+    "id": "54",
+    "name": "Ø 54 mm",
+    "diameter": 54,
+    "swl": 18.0,
+    "type": "metric"
+  },
+  {
+    "id": "60",
+    "name": "Ø 60 mm",
+    "diameter": 60,
+    "swl": 22.5,
+    "type": "metric"
+  },
+  {
+    "id": "66",
+    "name": "Ø 66 mm",
+    "diameter": 66,
+    "swl": 28.0,
+    "type": "metric"
+  },
+  {
+    "id": "72",
+    "name": "Ø 72 mm",
+    "diameter": 72,
+    "swl": 34.0,
+    "type": "metric"
+  },
+  {
+    "id": "78",
+    "name": "Ø 78 mm",
+    "diameter": 78,
+    "swl": 41.0,
+    "type": "metric"
+  },
+  {
+    "id": "84",
+    "name": "Ø 84 mm",
+    "diameter": 84,
+    "swl": 49.0,
+    "type": "metric"
+  },
+  {
+    "id": "90",
+    "name": "Ø 90 mm",
+    "diameter": 90,
+    "swl": 58.0,
+    "type": "metric"
+  },
+  {
+    "id": "96",
+    "name": "Ø 96 mm",
+    "diameter": 96,
+    "swl": 68.0,
+    "type": "metric"
+  },
+  {
+    "id": "102",
+    "name": "Ø 102 mm",
+    "diameter": 102,
+    "swl": 79.0,
+    "type": "metric"
+  },
+  {
+    "id": "108",
+    "name": "Ø 108 mm",
+    "diameter": 108,
+    "swl": 92.0,
+    "type": "metric"
+  },
+  {
+    "id": "114",
+    "name": "Ø 114 mm",
+    "diameter": 114,
+    "swl": 106.0,
+    "type": "metric"
+  },
+  {
+    "id": "120",
+    "name": "Ø 120 mm",
+    "diameter": 120,
+    "swl": 122.0,
+    "type": "metric"
+  },
+  {
+    "id": "126",
+    "name": "Ø 126 mm",
+    "diameter": 126,
+    "swl": 139.0,
+    "type": "metric"
+  },
+  {
+    "id": "132",
+    "name": "Ø 132 mm",
+    "diameter": 132,
+    "swl": 158.0,
+    "type": "metric"
+  },
+  {
+    "id": "144",
+    "name": "Ø 144 mm",
+    "diameter": 144,
+    "swl": 204.0,
+    "type": "metric"
+  }
+]

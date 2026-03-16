@@ -5,6 +5,16 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import materials from "../data/materials.json";
+import shackles from "../data/shackles.json";
+import slings from "../data/slings.json";
 
 // Initial Input State
 const initialInputs = {
@@ -73,7 +83,9 @@ const CheckBadge = ({
       <div>
         <p className="font-medium text-sm text-foreground">{label}</p>
         {formula && (
-          <p className="text-xs text-muted-foreground font-mono mt-1">{formula}</p>
+          <p className="text-xs text-muted-foreground font-mono mt-1">
+            {formula}
+          </p>
         )}
         <p className="text-xs text-muted-foreground font-mono mt-1">
           {isUnity
@@ -92,6 +104,9 @@ const CheckBadge = ({
 
 export default function PadeyeCalculator() {
   const [inputs, setInputs] = useState(initialInputs);
+  const [selectedMaterial, setSelectedMaterial] = useState("SS400");
+  const [selectedShackle, setSelectedShackle] = useState("13-1/2T");
+  const [selectedSling, setSelectedSling] = useState("42");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -99,6 +114,64 @@ export default function PadeyeCalculator() {
       ...prev,
       [name]: parseFloat(value) || 0,
     }));
+
+    // Switch to custom if user manually edits Fy or Fu
+    if (name === "Fy" || name === "Fu") {
+      setSelectedMaterial("custom");
+    }
+    // Switch to custom if user manually edits shackle props
+    if (name === "B" || name === "C" || name === "A") {
+      setSelectedShackle("custom");
+    }
+    // Switch to custom if user manually edits sling props
+    if (name === "d1") {
+      setSelectedSling("custom");
+    }
+  };
+
+  const handleMaterialChange = (matId: string | null) => {
+    if (!matId) return;
+    setSelectedMaterial(matId);
+    if (matId === "custom") return;
+
+    const mat = materials.find((m) => m.id === matId);
+    if (mat) {
+      setInputs((prev) => ({
+        ...prev,
+        Fy: mat.fy_mpa,
+        Fu: mat.fu_mpa,
+      }));
+    }
+  };
+
+  const handleShackleChange = (shackleId: string | null) => {
+    if (!shackleId) return;
+    setSelectedShackle(shackleId);
+    if (shackleId === "custom") return;
+
+    const shackle = shackles.find((s) => s.wll === shackleId);
+    if (shackle) {
+      setInputs((prev) => ({
+        ...prev,
+        A: shackle.a,
+        B: shackle.b,
+        C: shackle.c,
+      }));
+    }
+  };
+
+  const handleSlingChange = (slingId: string | null) => {
+    if (!slingId) return;
+    setSelectedSling(slingId);
+    if (slingId === "custom") return;
+
+    const sling = slings.find((s) => s.id === slingId);
+    if (sling) {
+      setInputs((prev) => ({
+        ...prev,
+        d1: sling.diameter,
+      }));
+    }
   };
 
   // Convert kN to N for calculations, but since Fy is in MPa (N/mm2), and geometric properties are mm,
@@ -186,13 +259,6 @@ export default function PadeyeCalculator() {
 
   const inputGroups = [
     {
-      title: "Material Properties",
-      fields: [
-        { key: "Fy", label: "Yield Strength Fy (MPa)" },
-        { key: "Fu", label: "Ultimate Strength Fu (MPa)" },
-      ],
-    },
-    {
       title: "Padeye Geometry",
       fields: [
         { key: "R1", label: "Main Radius R1 (mm)" },
@@ -204,16 +270,6 @@ export default function PadeyeCalculator() {
         { key: "L", label: "Base Length L (mm)" },
         { key: "alpha", label: "Sling Angle α (deg)" },
         { key: "h_wm", label: "Weld Size h_wm (mm)" },
-      ],
-    },
-    {
-      title: "Shackle & Clearance",
-      fields: [
-        { key: "B", label: "Shackle Pin Dia B (mm)" },
-        { key: "C", label: "Shackle Jaw Len C (mm)" },
-        { key: "A", label: "Shackle Jaw Width A (mm)" },
-        { key: "d1", label: "Sling Dia d1 (mm)" },
-        { key: "G1", label: "Safety Gap G1 (mm)" },
       ],
     },
   ];
@@ -323,6 +379,222 @@ export default function PadeyeCalculator() {
                     kG
                   </span>
                 </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* MATERIAL PROPERTIES CARD */}
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <CardTitle className="text-lg font-bold text-foreground">
+              Material Properties
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 space-y-4">
+            <div className="space-y-2">
+              <Label className="text-[10px] uppercase font-bold text-muted-foreground">
+                Material Grade
+              </Label>
+              <Select
+                value={selectedMaterial}
+                onValueChange={handleMaterialChange}>
+                <SelectTrigger className="w-full font-mono h-8 bg-muted border-border focus:ring-ring shadow-none text-xs">
+                  <SelectValue placeholder="Select material grade" />
+                </SelectTrigger>
+                <SelectContent>
+                  {materials.map((mat) => (
+                    <SelectItem
+                      key={mat.id}
+                      value={mat.id}
+                      className="font-mono text-xs">
+                      {mat.name}
+                    </SelectItem>
+                  ))}
+                  <SelectItem
+                    value="custom"
+                    className="font-mono text-xs">
+                    Custom / Manual
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="Fy"
+                  className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Yield Strength Fy (MPa)
+                </Label>
+                <Input
+                  id="Fy"
+                  name="Fy"
+                  type="number"
+                  value={inputs.Fy}
+                  onChange={handleChange}
+                  className="font-mono h-8 bg-muted border-border focus-visible:ring-ring shadow-none text-xs"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="Fu"
+                  className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Ultimate Strength Fu (MPa)
+                </Label>
+                <Input
+                  id="Fu"
+                  name="Fu"
+                  type="number"
+                  value={inputs.Fu}
+                  onChange={handleChange}
+                  className="font-mono h-8 bg-muted border-border focus-visible:ring-ring shadow-none text-xs"
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* SHACKLE & CLEARANCE CARD */}
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <CardTitle className="text-lg font-bold text-foreground">
+              Shackle & Sling
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Shackle Size
+                </Label>
+                <Select
+                  value={selectedShackle}
+                  onValueChange={handleShackleChange}>
+                  <SelectTrigger className="w-full font-mono h-8 bg-muted border-border focus:ring-ring shadow-none text-xs">
+                    <SelectValue placeholder="Select shackle" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {shackles.map((s) => (
+                      <SelectItem
+                        key={s.wll}
+                        value={s.wll}
+                        className="font-mono text-xs">
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                    <SelectItem
+                      value="custom"
+                      className="font-mono text-xs">
+                      Custom / Manual
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Sling Size
+                </Label>
+                <Select
+                  value={selectedSling}
+                  onValueChange={handleSlingChange}>
+                  <SelectTrigger className="w-full font-mono h-8 bg-muted border-border focus:ring-ring shadow-none text-xs">
+                    <SelectValue placeholder="Select sling" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {slings.map((s) => (
+                      <SelectItem
+                        key={s.id}
+                        value={s.id}
+                        className="font-mono text-xs">
+                        {s.name}
+                      </SelectItem>
+                    ))}
+                    <SelectItem
+                      value="custom"
+                      className="font-mono text-xs">
+                      Custom / Manual
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="B"
+                  className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Shackle Pin Dia B (mm)
+                </Label>
+                <Input
+                  id="B"
+                  name="B"
+                  type="number"
+                  value={inputs.B}
+                  onChange={handleChange}
+                  className="font-mono h-8 bg-muted border-border focus-visible:ring-ring shadow-none text-xs"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="C"
+                  className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Shackle Jaw Len C (mm)
+                </Label>
+                <Input
+                  id="C"
+                  name="C"
+                  type="number"
+                  value={inputs.C}
+                  onChange={handleChange}
+                  className="font-mono h-8 bg-muted border-border focus-visible:ring-ring shadow-none text-xs"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="A"
+                  className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Shackle Jaw Width A (mm)
+                </Label>
+                <Input
+                  id="A"
+                  name="A"
+                  type="number"
+                  value={inputs.A}
+                  onChange={handleChange}
+                  className="font-mono h-8 bg-muted border-border focus-visible:ring-ring shadow-none text-xs"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="d1"
+                  className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Sling Dia d1 (mm)
+                </Label>
+                <Input
+                  id="d1"
+                  name="d1"
+                  type="number"
+                  value={inputs.d1}
+                  onChange={handleChange}
+                  className="font-mono h-8 bg-muted border-border focus-visible:ring-ring shadow-none text-xs"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label
+                  htmlFor="G1"
+                  className="text-[10px] uppercase font-bold text-muted-foreground">
+                  Safety Gap G1 (mm)
+                </Label>
+                <Input
+                  id="G1"
+                  name="G1"
+                  type="number"
+                  value={inputs.G1}
+                  onChange={handleChange}
+                  className="font-mono h-8 bg-muted border-border focus-visible:ring-ring shadow-none text-xs"
+                />
               </div>
             </div>
           </CardContent>
