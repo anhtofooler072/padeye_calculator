@@ -12,33 +12,35 @@ interface PadeyeParams {
 const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
   const PAD_CANVAS = 400; // px
 
-  // Derived dimensions
-  const mainDia = params.width;
-  const mainHeight = params.baseHeight + mainDia / 2;
+  // Derived dimensions to match exact front view scale
+  const radius = params.width / 2;
+  const mainHeight = params.baseHeight + radius;
   const cheekHeight = params.cheekDia;
 
-  // Calculate actual bounding dimensions
-  const totalDrawingWidth = params.cheekThk * 2 + params.mainThk;
-  const totalDrawingHeight = mainHeight;
-
-  // Leave some padding around the drawing (e.g., 60% of canvas size)
+  // Use front view dimensions to calculate an identical scale across both canvases
+  const frontDrawingWidth = params.width;
+  const frontDrawingHeight = mainHeight;
   const maxDrawingSize = PAD_CANVAS * 0.6;
-  const scaleX = maxDrawingSize / totalDrawingWidth;
-  const scaleY = maxDrawingSize / totalDrawingHeight;
+  const scaleXFront = maxDrawingSize / frontDrawingWidth;
+  const scaleYFront = maxDrawingSize / frontDrawingHeight;
+  const scale = Math.min(scaleXFront, scaleYFront);
 
-  // Preserve aspect ratio
-  const scale = Math.min(scaleX, scaleY);
+  // Side view actual width
+  const totalDrawingWidthSide = params.cheekThk * 2 + params.mainThk;
+  const scaledWidth = totalDrawingWidthSide * scale;
+  const scaledHeight = mainHeight * scale;
 
-  const scaledWidth = totalDrawingWidth * scale;
-  const scaledHeight = totalDrawingHeight * scale;
-
-  // Center the drawing completely in the canvas
+  // Center horizontally
   const offsetX = (PAD_CANVAS - scaledWidth) / 2;
-  const offsetY = (PAD_CANVAS - scaledHeight) / 2 + 25; // Shift down slightly for top dimension lines
+  // Offset Y: place the top of the bounding box so the base aligns perfectly
+  // The front view bounding box height is the same as the side view main plate height.
+  // absoluteBaseY = (PAD_CANVAS - scaledHeight) / 2 + scaledHeight
+  // Because main plate starts at y=0, offsetY is simply:
+  const offsetY = (PAD_CANVAS - scaledHeight) / 2;
 
-  // Center of padding hole from top of main plate is radius = mainDia / 2
-  const holeCenterY = mainDia / 2;
-  // Cheek plates are centered on the hole
+  // Center of the pin hole from the top edge is `radius`
+  const holeCenterY = radius;
+  // Cheek plates are centered symmetrically on the pin hole
   const cheekOffsetY = holeCenterY - cheekHeight / 2;
 
   return (
@@ -88,7 +90,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
               points={[
                 -30,
                 holeCenterY * scale,
-                totalDrawingWidth * scale + 30,
+                totalDrawingWidthSide * scale + 30,
                 holeCenterY * scale,
               ]}
               stroke="#94a3b8"
@@ -227,7 +229,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
               points={[
                 0,
                 mainHeight * scale + 20,
-                totalDrawingWidth * scale,
+                totalDrawingWidthSide * scale,
                 mainHeight * scale + 20,
               ]}
               stroke="#0ea5e9"
@@ -243,18 +245,18 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
             />
             <Line
               points={[
-                totalDrawingWidth * scale,
+                totalDrawingWidthSide * scale,
                 mainHeight * scale + 16,
-                totalDrawingWidth * scale,
+                totalDrawingWidthSide * scale,
                 mainHeight * scale + 24,
               ]}
               stroke="#0ea5e9"
               strokeWidth={1}
             />
             <Text
-              text={`Total Thickness: ${totalDrawingWidth} mm`}
-              x={(totalDrawingWidth * scale) / 2 - 50}
-              y={mainHeight * scale + 25}
+              text={`Total Thickness: ${totalDrawingWidthSide} mm`}
+              x={(totalDrawingWidthSide * scale) / 2 - 50}
+              y={mainHeight * scale + 30}
               fontSize={12}
               fill="#0ea5e9"
             />
