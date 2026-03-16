@@ -106,10 +106,9 @@ export default function PadeyeCalculator() {
   const calculatedF1_kG = inputs.n * inputs.SLp;
   const calculatedF2_kG = 0.05 * inputs.SLp;
 
-  // Convert kG to Newtons (assuming 1 kG = 9.81 N or similar, but the previous code converted 17095.5 kG to ~170955 N, meaning 1 kG = 10 N as standard for lifting or safe bound)
-  // Let's use 1 kG = 10 N as per previous logic (170.955 kN).
+  // We operate in kg and cm^2 for strength checks based on standard ship design unit practice
   const F1 = calculatedF1_kG;
-  const F2 = calculatedF2_kG * 10;
+  const F2 = calculatedF2_kG;
 
   const Fy = inputs.Fy;
   const Fu = inputs.Fu;
@@ -132,32 +131,34 @@ export default function PadeyeCalculator() {
   const Sx_II = (L * t1 * t1) / 6;
 
   // 3. Allowables
-  const dn_rup = 0.5 * (Fu*10.1972);
-  const dn_yld = 0.6 * (Fy*10.1972);
-  const dn_shrup = 0.3 * Fu;
-  const dn_shyld = 0.4 * (Fy*10.1972);
-  const dn_bear = 0.9 * Fy;
+  const dn_rup = 0.5 * (Fu * 10.1972);
+  const dn_yld = 0.6 * (Fy * 10.1972);
+  const dn_shrup = 0.3 * (Fu * 10.1972);
+  const dn_shyld = 0.4 * (Fy * 10.1972);
+  const dn_bear = 0.9 * (Fy * 10.1972);
 
   // 4. Unity Checks
   // Section I-I
   const du1 = F1 / (A_I / 100);
   const r411 = du1 / dn_rup;
   const r412 = du1 / dn_yld;
-  const Tu3 = F1 / (2 * (A_III/100));
+  const Tu3 = F1 / (2 * (A_III / 100));
   const r413 = r412 + Math.pow(Tu3 / dn_shyld, 2);
   const uc_I = Math.max(r411, r412, r413);
 
   // Section II-II
-  const du21 = (F1 * Math.sin(alphaRad)) / A_II;
-  const du22 = (F1 * Math.cos(alphaRad) * H) / Sz_II;
-  const du23 = (F2 * H) / Sx_II;
+  const du21 = (F1 * Math.sin(alphaRad)) / (A_II / 100);
+  // H is mm, Sz_II is mm3. To get the moment arm F1 * cos() * H/10 in cm. Sz_II/1000 in cm3.
+  // F1*cos() * (H/10) / (Sz_II / 1000)
+  const du22 = (F1 * Math.cos(alphaRad) * (H / 10)) / (Sz_II / 1000);
+  const du23 = (F2 * (H / 10)) / (Sx_II / 1000);
   const du2 = du21 + du22 + du23;
 
   const r421 = du2 / dn_rup;
   const r422 = du2 / dn_yld;
 
-  const Txy = (F1 * Math.cos(alphaRad)) / A_II;
-  const Txz = F2 / A_II;
+  const Txy = (F1 * Math.cos(alphaRad)) / (A_II / 100);
+  const Txz = F2 / (A_II / 100);
   const Tu2 = Math.max(Txy, Txz);
 
   const r423 = Tu2 / dn_shrup;
@@ -172,14 +173,17 @@ export default function PadeyeCalculator() {
 
   // Bearing
   const A_pb = 2 * R3 * (t1 + 2 * t2);
-  const dub = F1 / A_pb;
+  const dub = F1 / (A_pb / 100);
   const uc_pb = dub / dn_bear;
 
   // Weld
   const l_w = 2 * L;
   const A_w = 0.707 * l_w * h_wm;
-  const Tuw = F1 / A_w;
-  const Fw = 0.6 * Fy * (1 + 0.5 * Math.pow(Math.abs(Math.sin(alphaRad)), 1.5));
+  const Tuw = F1 / (A_w / 100);
+  const Fw =
+    0.6 *
+    (Fy * 10.1972) *
+    (1 + 0.5 * Math.pow(Math.abs(Math.sin(alphaRad)), 1.5));
   const dnw = Fw / 2; // Allowable weld stress
   const uc_weld = Tuw / dnw;
 
@@ -467,21 +471,21 @@ export default function PadeyeCalculator() {
                   formula="F1 / A_I-I"
                   value={du1}
                   unit="kG/cm²"
-                  />
+                />
                 <CheckBadge
                   label="(4.1-1) Tensile Rupture"
                   formula="δn = 0.5·Fu (Ωt=2)"
                   value={r411}
                   limit={1.0}
                   isUnity={true}
-                  />
+                />
                 <CheckBadge
                   label="(4.1-2) Tensile Yielding"
                   formula="δn = 0.6·Fy (Ωt=1.67)"
                   value={r412}
                   limit={1.0}
                   isUnity={true}
-                  />
+                />
                 <CheckBadge
                   label="(4.1-3) Combined T+S"
                   formula="(δu/δn) + (Tu/δns)² ≤ 1"
@@ -498,32 +502,61 @@ export default function PadeyeCalculator() {
                 4.2 - Check Tensile Strength • Section II-II
               </h3>
               <div className="grid grid-cols-1 gap-2">
+                <PropertyBadge
+                  label="δu1 — Axial"
+                  formula="F1·sinα / A_II-II"
+                  value={du21}
+                  unit="kG/cm²"
+                />
+                <PropertyBadge
+                  label="δu2 — Inplane bending"
+                  formula="F1·cosα·H / Sz_II-II"
+                  value={du22}
+                  unit="kG/cm²"
+                />
+                <PropertyBadge
+                  label="δu3 — Outplane bending"
+                  formula="F2·H / Sx_II-II"
+                  value={du23}
+                  unit="kG/cm²"
+                />
+                <PropertyBadge
+                  label="δu Combined"
+                  formula="δu1 + δu2 + δu3"
+                  value={du2}
+                  unit="kG/cm²"
+                />
                 <CheckBadge
                   label="(4.2-1) Tensile Rupture"
+                  formula="δn = 0.5·Fu"
                   value={r421}
                   limit={1.0}
                   isUnity={true}
                 />
                 <CheckBadge
                   label="(4.2-2) Tensile Yielding"
+                  formula="δn = 0.6·Fy"
                   value={r422}
                   limit={1.0}
                   isUnity={true}
                 />
                 <CheckBadge
                   label="(4.2-3) Shear Rupture"
+                  formula="τn = 0.3·Fu"
                   value={r423}
                   limit={1.0}
                   isUnity={true}
                 />
                 <CheckBadge
                   label="(4.2-4) Shear Yielding"
+                  formula="τn = 0.4·Fy"
                   value={r424}
                   limit={1.0}
                   isUnity={true}
                 />
                 <CheckBadge
                   label="(4.2-5) Combined T+S"
+                  formula="(δu/δn) + (Tu/δns)² ≤ 1"
                   value={r425}
                   limit={1.0}
                   isUnity={true}
@@ -537,14 +570,22 @@ export default function PadeyeCalculator() {
                 5 - Check Shear Strength • Section III-III
               </h3>
               <div className="grid grid-cols-1 gap-2">
+                <PropertyBadge
+                  label="Tu — Required shear"
+                  formula="F1 / (2 × A_III-III)"
+                  value={Tu3}
+                  unit="kG/cm²"
+                />
                 <CheckBadge
                   label="(5-1) Shear Rupture"
+                  formula="0.3·Fu (Ωt=2)"
                   value={r51}
                   limit={1.0}
                   isUnity={true}
                 />
                 <CheckBadge
                   label="(5-2) Shear Yielding"
+                  formula="0.4·Fy"
                   value={r52}
                   limit={1.0}
                   isUnity={true}
@@ -558,8 +599,21 @@ export default function PadeyeCalculator() {
                 6 - Check Bearing Strength
               </h3>
               <div className="grid grid-cols-1 gap-2">
+                <PropertyBadge
+                  label="Bearing area A_pb"
+                  formula="2 × R3 × (t1 + 2t2)"
+                  value={A_pb / 100}
+                  unit="cm²"
+                />
+                <PropertyBadge
+                  label="Required stress δu"
+                  formula="F1 / A_pb"
+                  value={dub}
+                  unit="kG/cm²"
+                />
                 <CheckBadge
                   label="(6-1) Bearing Strength"
+                  formula="δn = 0.9·Fy"
                   value={uc_pb}
                   limit={1.0}
                   isUnity={true}
@@ -573,8 +627,27 @@ export default function PadeyeCalculator() {
                 7 - Check Weld Stress
               </h3>
               <div className="grid grid-cols-1 gap-2">
+                <PropertyBadge
+                  label="Weld throat area A_w"
+                  formula="0.707 × l_w × h_wm   (l_w=2L)"
+                  value={A_w / 100}
+                  unit="cm²"
+                />
+                <PropertyBadge
+                  label="Required stress Tu"
+                  formula="F1 / A_w"
+                  value={Tuw}
+                  unit="kG/cm²"
+                />
+                <PropertyBadge
+                  label="Allowable Fw"
+                  formula="0.6·Fy·(1 + 0.5·sin^1.5(α)) / Ω"
+                  value={dnw}
+                  unit="kG/cm²"
+                />
                 <CheckBadge
                   label="(7-2) Weld Stress"
+                  formula="Tu / δn ≤ 1.0"
                   value={uc_weld}
                   limit={1.0}
                   isUnity={true}
