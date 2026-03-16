@@ -161,10 +161,10 @@ export default function PadeyeCalculator() {
   const Txz = F2 / (A_II / 100);
   const Tu2 = Math.max(Txy, Txz);
 
-  const r423 = Tu2 / dn_shrup;
-  const r424 = Tu2 / dn_shyld;
+//   const r423 = Tu2 / dn_shrup;
+//   const r424 = Tu2 / dn_shyld;
   const r425 = r422 + Math.pow(Tu2 / dn_shyld, 2);
-  const uc_II = Math.max(r421, r422, r423, r424, r425);
+  const uc_II = Math.max(r421, r422, r425);
 
   // Section III-III
   const r51 = Tu3 / dn_shrup;
@@ -541,21 +541,7 @@ export default function PadeyeCalculator() {
                   isUnity={true}
                 />
                 <CheckBadge
-                  label="(4.2-3) Shear Rupture"
-                  formula="τn = 0.3·Fu"
-                  value={r423}
-                  limit={1.0}
-                  isUnity={true}
-                />
-                <CheckBadge
-                  label="(4.2-4) Shear Yielding"
-                  formula="τn = 0.4·Fy"
-                  value={r424}
-                  limit={1.0}
-                  isUnity={true}
-                />
-                <CheckBadge
-                  label="(4.2-5) Combined T+S"
+                  label="(4.2-3) Combined T+S"
                   formula="(δu/δn) + (Tu/δns)² ≤ 1"
                   value={r425}
                   limit={1.0}
