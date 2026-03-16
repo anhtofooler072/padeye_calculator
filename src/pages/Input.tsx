@@ -2,7 +2,7 @@ import { useState } from "react";
 import CombinedPadeye from "../components/konva/CombinedPadeye";
 
 export default function Input() {
-  const PAD_CANVAS = 300; // Shared canvas size for both views
+  const PAD_CANVAS = 400; // Shared canvas size for both views
 
   const [params, setParams] = useState({
     width: 180, // Total width of the plate (main plate diameter)
