@@ -27,6 +27,7 @@ export default function CombinedPadeye({
     shackleA: 80,
     shackleB: 38.1,
     shackleC: 133,
+    slingD: 30,
     ...params,
   };
 

@@ -78,12 +78,29 @@ const PadeyeSide = ({
     (params.shackleB ? params.shackleB / 2 : 0) -
     (params.shackleC || 0);
   const outerBowTopY = innerBowTopY - shackleEarThickness;
+  const slingR =
+    (params.slingD || (params.shackleB ? params.shackleB * 0.8 : 0)) / 2;
 
   // Dynamic offset for plate top annotations
   const topOfDrawing = hasShackle ? Math.min(0, outerBowTopY) : 0;
   const annY1 = topOfDrawing - 30; // Main plate Y
   const annY2 = topOfDrawing - 55; // Cheek plate Y
   const annLabelY = earBottomY + 25; // A/Clearance Label Y
+
+  // Dynamic X offsets for multileaders to avoid shackle and sling
+  const leftLeaderX = hasShackle
+    ? Math.min(
+        -75,
+        (cx - params.shackleA! / 2 - shackleEarThickness) * scale - 55,
+      )
+    : -75;
+  const rightLeaderEndX = hasShackle
+    ? Math.max(
+        totalDrawingWidthSide * scale + 70,
+        (cx + params.shackleA! / 2 + shackleEarThickness) * scale + 80, // Push well past the C label
+      )
+    : totalDrawingWidthSide * scale + 70;
+  const rightLeaderTextX = rightLeaderEndX - 40;
 
   return (
     <div className="bg-white p-4 rounded shadow-inner border border-slate-200">
@@ -150,10 +167,8 @@ const PadeyeSide = ({
                 {/* Left Shackle Ear & Body up to the Bow */}
                 <Path
                   data={`M ${(cx - params.shackleA! / 2) * scale} ${earBottomY * scale} 
-                         L ${(cx - params.shackleA! / 2) * scale} ${(holeCenterY - params.shackleB! / 2 - params.shackleC! / 2) * scale} 
-                         C ${(cx - params.shackleA! / 2) * scale} ${innerBowTopY * scale},
-                           ${(cx + params.shackleA! / 2) * scale} ${innerBowTopY * scale},
-                           ${(cx + params.shackleA! / 2) * scale} ${(holeCenterY - params.shackleB! / 2 - params.shackleC! / 2) * scale} 
+                         L ${(cx - params.shackleA! / 2) * scale} ${(innerBowTopY + params.shackleA! / 2) * scale} 
+                         A ${(params.shackleA! / 2) * scale} ${(params.shackleA! / 2) * scale} 0 0 1 ${(cx + params.shackleA! / 2) * scale} ${(innerBowTopY + params.shackleA! / 2) * scale} 
                          L ${(cx + params.shackleA! / 2) * scale} ${earBottomY * scale}`}
                   stroke="#f59e0b"
                   strokeWidth={2}
@@ -161,13 +176,22 @@ const PadeyeSide = ({
                   fill="transparent"
                 />
 
+                {/* Sling Overlay (inside the bow) */}
+                <Circle
+                  x={cx * scale}
+                  y={(innerBowTopY + slingR + 2) * scale}
+                  radius={slingR * scale}
+                  stroke="#10b981"
+                  strokeWidth={2}
+                  dash={[4, 4]}
+                  fill="transparent"
+                />
+
                 {/* Outer edge of Shackle Ear & Body */}
                 <Path
                   data={`M ${(cx - params.shackleA! / 2 - shackleEarThickness) * scale} ${earBottomY * scale} 
-                         L ${(cx - params.shackleA! / 2 - shackleEarThickness) * scale} ${(holeCenterY - params.shackleB! / 2 - params.shackleC! / 2) * scale} 
-                         C ${(cx - params.shackleA! / 2 - shackleEarThickness) * scale} ${outerBowTopY * scale},
-                           ${(cx + params.shackleA! / 2 + shackleEarThickness) * scale} ${outerBowTopY * scale},
-                           ${(cx + params.shackleA! / 2 + shackleEarThickness) * scale} ${(holeCenterY - params.shackleB! / 2 - params.shackleC! / 2) * scale} 
+                         L ${(cx - params.shackleA! / 2 - shackleEarThickness) * scale} ${(innerBowTopY + params.shackleA! / 2) * scale} 
+                         A ${(params.shackleA! / 2 + shackleEarThickness) * scale} ${(params.shackleA! / 2 + shackleEarThickness) * scale} 0 0 1 ${(cx + params.shackleA! / 2 + shackleEarThickness) * scale} ${(innerBowTopY + params.shackleA! / 2) * scale} 
                          L ${(cx + params.shackleA! / 2 + shackleEarThickness) * scale} ${earBottomY * scale}`}
                   stroke="#f59e0b"
                   strokeWidth={2}
@@ -283,9 +307,9 @@ const PadeyeSide = ({
                 {/* Shackle Inside Length (C) Annotation */}
                 <Line
                   points={[
-                    cx * scale,
+                    (cx + slingR + 6) * scale,
                     innerBowTopY * scale,
-                    (cx + params.shackleA! / 2 + shackleEarThickness + 30) *
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 40) *
                       scale,
                     innerBowTopY * scale,
                   ]}
@@ -298,7 +322,7 @@ const PadeyeSide = ({
                     (cx + params.shackleA! / 2 + shackleEarThickness + 10) *
                       scale,
                     (holeCenterY - params.shackleB! / 2) * scale,
-                    (cx + params.shackleA! / 2 + shackleEarThickness + 30) *
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 40) *
                       scale,
                     (holeCenterY - params.shackleB! / 2) * scale,
                   ]}
@@ -308,10 +332,10 @@ const PadeyeSide = ({
                 />
                 <Line
                   points={[
-                    (cx + params.shackleA! / 2 + shackleEarThickness + 20) *
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 30) *
                       scale,
                     (holeCenterY - params.shackleB! / 2) * scale,
-                    (cx + params.shackleA! / 2 + shackleEarThickness + 20) *
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 30) *
                       scale,
                     innerBowTopY * scale,
                   ]}
@@ -324,7 +348,7 @@ const PadeyeSide = ({
                 <Text
                   text={`C = ${params.shackleC} mm`}
                   x={
-                    (cx + params.shackleA! / 2 + shackleEarThickness + 25) *
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 35) *
                     scale
                   }
                   y={
@@ -358,9 +382,9 @@ const PadeyeSide = ({
                   (params.cheekThk + params.mainThk / 2) * scale,
                   15,
                   -30,
-                  -25,
-                  -75,
-                  -25,
+                  -35,
+                  leftLeaderX,
+                  -35,
                 ]}
                 stroke="#64748b"
                 strokeWidth={1}
@@ -373,8 +397,8 @@ const PadeyeSide = ({
               />
               <Text
                 text={`THK.${params.mainThk}`}
-                x={-75}
-                y={-40}
+                x={leftLeaderX}
+                y={-50}
                 fontSize={11}
                 fill="#64748b"
               />
@@ -388,7 +412,7 @@ const PadeyeSide = ({
                   cheekOffsetY * scale + 15,
                   totalDrawingWidthSide * scale + 30,
                   cheekOffsetY * scale - 25,
-                  totalDrawingWidthSide * scale + 70,
+                  rightLeaderEndX,
                   cheekOffsetY * scale - 25,
                 ]}
                 stroke="#64748b"
@@ -402,7 +426,7 @@ const PadeyeSide = ({
               />
               <Text
                 text={`THK.${params.cheekThk}`}
-                x={totalDrawingWidthSide * scale + 30}
+                x={rightLeaderTextX}
                 y={cheekOffsetY * scale - 40}
                 fontSize={11}
                 fill="#64748b"
