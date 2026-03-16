@@ -38,8 +38,8 @@ const PadeyeDraft = ({
   const totalDrawingWidth = params.width;
   const totalDrawingHeight = params.baseHeight + radius;
 
-  // Leave some padding around the drawing (e.g., 60% of canvas size) for annotations
-  const maxDrawingSize = PAD_CANVAS * 0.6;
+  // Leave some padding around the drawing (e.g., 45% of canvas size) for annotations and shackle
+  const maxDrawingSize = PAD_CANVAS * 0.45;
   const scaleX = maxDrawingSize / totalDrawingWidth;
   const scaleY = maxDrawingSize / totalDrawingHeight;
 

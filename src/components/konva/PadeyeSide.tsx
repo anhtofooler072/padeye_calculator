@@ -1,4 +1,14 @@
-import { Stage, Layer, Rect, Group, Line, Text } from "react-konva";
+import {
+  Stage,
+  Layer,
+  Rect,
+  Group,
+  Line,
+  Text,
+  Arc,
+  Path,
+  Circle,
+} from "react-konva";
 
 interface PadeyeParams {
   width: number;
@@ -7,6 +17,10 @@ interface PadeyeParams {
   cheekDia: number;
   mainThk: number;
   cheekThk: number;
+  shackleA?: number;
+  shackleB?: number;
+  shackleC?: number;
+  slingD?: number;
 }
 
 const PadeyeSide = ({
@@ -26,7 +40,7 @@ const PadeyeSide = ({
   // Use front view dimensions to calculate an identical scale across both canvases
   const frontDrawingWidth = params.width;
   const frontDrawingHeight = mainHeight;
-  const maxDrawingSize = PAD_CANVAS * 0.6;
+  const maxDrawingSize = PAD_CANVAS * 0.45; // reduced from 0.6 to allow shackle overlay to fit
   const scaleXFront = maxDrawingSize / frontDrawingWidth;
   const scaleYFront = maxDrawingSize / frontDrawingHeight;
   const scale = Math.min(scaleXFront, scaleYFront);
@@ -48,6 +62,28 @@ const PadeyeSide = ({
   const holeCenterY = radius;
   // Cheek plates are centered symmetrically on the pin hole
   const cheekOffsetY = holeCenterY - cheekHeight / 2;
+
+  // --- Shackle Calculations ---
+  const cx = totalDrawingWidthSide / 2;
+  const hasShackle = !!(params.shackleA && params.shackleB && params.shackleC);
+
+  // Outer shackle bounds (approximated based on pin diameter for eye thickness)
+  const shackleEarThickness = params.shackleB ? params.shackleB * 1.0 : 0;
+
+  // New Shackle Component Y limits
+  const earBottomY =
+    holeCenterY + (params.shackleB ? params.shackleB / 2 : 0) + 15;
+  const innerBowTopY =
+    holeCenterY -
+    (params.shackleB ? params.shackleB / 2 : 0) -
+    (params.shackleC || 0);
+  const outerBowTopY = innerBowTopY - shackleEarThickness;
+
+  // Dynamic offset for plate top annotations
+  const topOfDrawing = hasShackle ? Math.min(0, outerBowTopY) : 0;
+  const annY1 = topOfDrawing - 30; // Main plate Y
+  const annY2 = topOfDrawing - 55; // Cheek plate Y
+  const annLabelY = earBottomY + 25; // A/Clearance Label Y
 
   return (
     <div className="bg-white p-4 rounded shadow-inner border border-slate-200">
@@ -91,6 +127,217 @@ const PadeyeSide = ({
               fill="#cbd5e1" // Light green
             />
 
+            {/* --- Shackle Overlay --- */}
+            {hasShackle && (
+              <Group>
+                {/* Pin */}
+                <Rect
+                  x={
+                    (cx - params.shackleA! / 2 - shackleEarThickness - 10) *
+                    scale
+                  }
+                  y={(holeCenterY - params.shackleB! / 2) * scale}
+                  width={
+                    (params.shackleA! + 2 * shackleEarThickness + 20) * scale
+                  }
+                  height={params.shackleB! * scale}
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  dash={[5, 5]}
+                  fill="transparent"
+                />
+
+                {/* Left Shackle Ear & Body up to the Bow */}
+                <Path
+                  data={`M ${(cx - params.shackleA! / 2) * scale} ${earBottomY * scale} 
+                         L ${(cx - params.shackleA! / 2) * scale} ${(holeCenterY - params.shackleB! / 2 - params.shackleC! / 2) * scale} 
+                         C ${(cx - params.shackleA! / 2) * scale} ${innerBowTopY * scale},
+                           ${(cx + params.shackleA! / 2) * scale} ${innerBowTopY * scale},
+                           ${(cx + params.shackleA! / 2) * scale} ${(holeCenterY - params.shackleB! / 2 - params.shackleC! / 2) * scale} 
+                         L ${(cx + params.shackleA! / 2) * scale} ${earBottomY * scale}`}
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  dash={[5, 5]}
+                  fill="transparent"
+                />
+
+                {/* Outer edge of Shackle Ear & Body */}
+                <Path
+                  data={`M ${(cx - params.shackleA! / 2 - shackleEarThickness) * scale} ${earBottomY * scale} 
+                         L ${(cx - params.shackleA! / 2 - shackleEarThickness) * scale} ${(holeCenterY - params.shackleB! / 2 - params.shackleC! / 2) * scale} 
+                         C ${(cx - params.shackleA! / 2 - shackleEarThickness) * scale} ${outerBowTopY * scale},
+                           ${(cx + params.shackleA! / 2 + shackleEarThickness) * scale} ${outerBowTopY * scale},
+                           ${(cx + params.shackleA! / 2 + shackleEarThickness) * scale} ${(holeCenterY - params.shackleB! / 2 - params.shackleC! / 2) * scale} 
+                         L ${(cx + params.shackleA! / 2 + shackleEarThickness) * scale} ${earBottomY * scale}`}
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  dash={[5, 5]}
+                  fill="transparent"
+                />
+
+                {/* Ear bottom arcs (simplified) */}
+                <Line
+                  points={[
+                    (cx - params.shackleA! / 2 - shackleEarThickness) * scale,
+                    earBottomY * scale,
+                    (cx - params.shackleA! / 2) * scale,
+                    earBottomY * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  dash={[5, 5]}
+                />
+                <Line
+                  points={[
+                    (cx + params.shackleA! / 2) * scale,
+                    earBottomY * scale,
+                    (cx + params.shackleA! / 2 + shackleEarThickness) * scale,
+                    earBottomY * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={2}
+                  dash={[5, 5]}
+                />
+
+                {/* Shackle Inside Width (A) Annotation */}
+                <Line
+                  points={[
+                    (cx - params.shackleA! / 2) * scale,
+                    (earBottomY + 5) * scale,
+                    (cx - params.shackleA! / 2) * scale,
+                    (annLabelY + 5) * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={1}
+                  dash={[2, 2]}
+                />
+                <Line
+                  points={[
+                    (cx + params.shackleA! / 2) * scale,
+                    (earBottomY + 5) * scale,
+                    (cx + params.shackleA! / 2) * scale,
+                    (annLabelY + 5) * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={1}
+                  dash={[2, 2]}
+                />
+                <Line
+                  points={[
+                    (cx - params.shackleA! / 2) * scale,
+                    annLabelY * scale,
+                    (cx + params.shackleA! / 2) * scale,
+                    annLabelY * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={1}
+                  pointerLength={4}
+                  pointerWidth={4}
+                  lineCap="round"
+                />
+                <Text
+                  text={`A = ${params.shackleA} mm`}
+                  x={cx * scale - 30}
+                  y={(annLabelY + 5) * scale}
+                  fontSize={11}
+                  fill="#d97706"
+                />
+
+                {/* Shackle Clearance Left Annotation */}
+                <Line
+                  points={[
+                    params.cheekThk * scale,
+                    (cheekOffsetY + cheekHeight) * scale,
+                    params.cheekThk * scale,
+                    (annLabelY + 5) * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={1}
+                  dash={[2, 2]}
+                />
+                <Line
+                  points={[
+                    (cx - params.shackleA! / 2) * scale,
+                    annLabelY * scale,
+                    params.cheekThk * scale,
+                    annLabelY * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={1}
+                  pointerLength={3}
+                  pointerWidth={3}
+                  lineCap="round"
+                />
+                <Text
+                  text={`${(0.5 * (params.shackleA! - params.mainThk - 2 * params.cheekThk)).toFixed(1)}`}
+                  x={
+                    ((cx - params.shackleA! / 2 + params.cheekThk) / 2) *
+                      scale -
+                    10
+                  }
+                  y={(annLabelY + 5) * scale}
+                  fontSize={10}
+                  fill="#d97706"
+                />
+
+                {/* Shackle Inside Length (C) Annotation */}
+                <Line
+                  points={[
+                    cx * scale,
+                    innerBowTopY * scale,
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 30) *
+                      scale,
+                    innerBowTopY * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={1}
+                  dash={[2, 2]}
+                />
+                <Line
+                  points={[
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 10) *
+                      scale,
+                    (holeCenterY - params.shackleB! / 2) * scale,
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 30) *
+                      scale,
+                    (holeCenterY - params.shackleB! / 2) * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={1}
+                  dash={[2, 2]}
+                />
+                <Line
+                  points={[
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 20) *
+                      scale,
+                    (holeCenterY - params.shackleB! / 2) * scale,
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 20) *
+                      scale,
+                    innerBowTopY * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  strokeWidth={1}
+                  pointerLength={4}
+                  pointerWidth={4}
+                  lineCap="round"
+                />
+                <Text
+                  text={`C = ${params.shackleC} mm`}
+                  x={
+                    (cx + params.shackleA! / 2 + shackleEarThickness + 25) *
+                    scale
+                  }
+                  y={
+                    ((innerBowTopY + holeCenterY - params.shackleB! / 2) / 2) *
+                      scale -
+                    8
+                  }
+                  fontSize={11}
+                  fill="#d97706"
+                />
+              </Group>
+            )}
+
             {/* --- Center Line (Pin Hole Axis) --- */}
             <Line
               points={[
@@ -104,131 +351,63 @@ const PadeyeSide = ({
               dash={[20, 6, 4, 6]}
             />
 
-            {/* --- Main Plate Annotation --- */}
-            {/* Extension lines */}
-            <Line
-              points={[
-                params.cheekThk * scale,
-                0,
-                params.cheekThk * scale,
-                -25,
-              ]}
-              stroke="#64748b"
-              strokeWidth={1}
-              dash={[4, 4]}
-            />
-            <Line
-              points={[
-                (params.cheekThk + params.mainThk) * scale,
-                0,
-                (params.cheekThk + params.mainThk) * scale,
-                -25,
-              ]}
-              stroke="#64748b"
-              strokeWidth={1}
-              dash={[4, 4]}
-            />
-            <Line
-              points={[
-                params.cheekThk * scale,
-                -20,
-                (params.cheekThk + params.mainThk) * scale,
-                -20,
-              ]}
-              stroke="#64748b"
-              strokeWidth={1}
-              lineCap="round"
-            />
-            <Line
-              points={[
-                params.cheekThk * scale,
-                -24,
-                params.cheekThk * scale,
-                -16,
-              ]}
-              stroke="#64748b"
-              strokeWidth={1}
-            />
-            <Line
-              points={[
-                (params.cheekThk + params.mainThk) * scale,
-                -24,
-                (params.cheekThk + params.mainThk) * scale,
-                -16,
-              ]}
-              stroke="#64748b"
-              strokeWidth={1}
-            />
-            <Text
-              text={`${params.mainThk} mm`}
-              x={(params.cheekThk + params.mainThk / 2) * scale - 20}
-              y={-35}
-              fontSize={12}
-              fill="#64748b"
-            />
+            {/* --- Main Plate Annotation (Multileader) --- */}
+            <Group>
+              <Line
+                points={[
+                  (params.cheekThk + params.mainThk / 2) * scale,
+                  15,
+                  -30,
+                  -25,
+                  -75,
+                  -25,
+                ]}
+                stroke="#64748b"
+                strokeWidth={1}
+              />
+              <Circle
+                x={(params.cheekThk + params.mainThk / 2) * scale}
+                y={15}
+                radius={2.5}
+                fill="#64748b"
+              />
+              <Text
+                text={`THK.${params.mainThk}`}
+                x={-75}
+                y={-40}
+                fontSize={11}
+                fill="#64748b"
+              />
+            </Group>
 
-            {/* --- Cheek Plate Annotation --- */}
-            {/* Extension lines */}
-            <Line
-              points={[
-                (params.cheekThk + params.mainThk) * scale,
-                cheekOffsetY * scale,
-                (params.cheekThk + params.mainThk) * scale,
-                -50,
-              ]}
-              stroke="#64748b"
-              strokeWidth={1}
-              dash={[4, 4]}
-            />
-            <Line
-              points={[
-                (params.cheekThk * 2 + params.mainThk) * scale,
-                cheekOffsetY * scale,
-                (params.cheekThk * 2 + params.mainThk) * scale,
-                -50,
-              ]}
-              stroke="#64748b"
-              strokeWidth={1}
-              dash={[4, 4]}
-            />
-            <Line
-              points={[
-                (params.cheekThk * 2 + params.mainThk) * scale,
-                -45,
-                (params.cheekThk + params.mainThk) * scale,
-                -45,
-              ]}
-              stroke="#64748b"
-              strokeWidth={1}
-              lineCap="round"
-            />
-            <Line
-              points={[
-                (params.cheekThk + params.mainThk) * scale,
-                -49,
-                (params.cheekThk + params.mainThk) * scale,
-                -41,
-              ]}
-              stroke="#64748b"
-              strokeWidth={1}
-            />
-            <Line
-              points={[
-                (params.cheekThk * 2 + params.mainThk) * scale,
-                -49,
-                (params.cheekThk * 2 + params.mainThk) * scale,
-                -41,
-              ]}
-              stroke="#64748b"
-              strokeWidth={1}
-            />
-            <Text
-              text={`${params.cheekThk} mm`}
-              x={(params.cheekThk * 1.5 + params.mainThk) * scale - 20}
-              y={-60}
-              fontSize={12}
-              fill="#64748b"
-            />
+            {/* --- Cheek Plate Annotation (Multileader) --- */}
+            <Group>
+              <Line
+                points={[
+                  (params.cheekThk * 1.5 + params.mainThk) * scale,
+                  cheekOffsetY * scale + 15,
+                  totalDrawingWidthSide * scale + 30,
+                  cheekOffsetY * scale - 25,
+                  totalDrawingWidthSide * scale + 70,
+                  cheekOffsetY * scale - 25,
+                ]}
+                stroke="#64748b"
+                strokeWidth={1}
+              />
+              <Circle
+                x={(params.cheekThk * 1.5 + params.mainThk) * scale}
+                y={cheekOffsetY * scale + 15}
+                radius={2.5}
+                fill="#64748b"
+              />
+              <Text
+                text={`THK.${params.cheekThk}`}
+                x={totalDrawingWidthSide * scale + 30}
+                y={cheekOffsetY * scale - 40}
+                fontSize={11}
+                fill="#64748b"
+              />
+            </Group>
 
             {/* Full Width Line Annotation */}
             <Line
