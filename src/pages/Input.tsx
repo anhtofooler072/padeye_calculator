@@ -1,5 +1,7 @@
-import PadeyeCalculator from "../components/PadeyeCalculator.tsx";
+﻿import PadeyeCalculator from "../components/PadeyeCalculator.tsx";
 import { ModeToggle } from "../components/mode-toggle.tsx";
+import { CanvasText } from "../components/ui/canvas-text.tsx";
+import { cn } from "@/lib/utils";
 
 export default function Input() {
   return (
@@ -8,11 +10,34 @@ export default function Input() {
       <div className="fixed inset-0 -z-10 h-full w-full bg-background bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
 
       <div className="flex flex-col gap-8 p-4 min-h-screen transition-colors duration-200">
-        <div className="flex justify-between items-center">
-          <div className="text-3xl font-bold text-foreground">
-            Padeye Design Validation
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <h2
+            className={cn(
+              "font-['Montserrat'] group relative max-w-2xl text-left text-lg leading-20 font-bold tracking-tight text-balance text-neutral-600 sm:text-4xl md:text-5xl xl:text-6xl dark:text-neutral-300",
+            )}>
+            Padeye Design{" "}
+            <CanvasText
+              text="Validation"
+              backgroundClassName="bg-blue-600 dark:bg-blue-700 !text-white"
+              colors={[
+                "rgba(0, 153, 255, 1)",
+                "rgba(0, 153, 255, 0.9)",
+                "rgba(0, 153, 255, 0.8)",
+                "rgba(0, 153, 255, 0.7)",
+                "rgba(0, 153, 255, 0.6)",
+                "rgba(0, 153, 255, 0.5)",
+                "rgba(0, 153, 255, 0.4)",
+                "rgba(0, 153, 255, 0.3)",
+                "rgba(0, 153, 255, 0.2)",
+                "rgba(0, 153, 255, 0.1)",
+              ]}
+              lineGap={4}
+              animationDuration={20}
+            />
+          </h2>
+          <div className="shrink-0">
+            <ModeToggle />
           </div>
-          <ModeToggle />
         </div>
 
         {/* Calculator based on README */}
