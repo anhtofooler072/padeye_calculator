@@ -157,14 +157,11 @@ export default function PadeyeCalculator() {
   const r421 = du2 / dn_rup;
   const r422 = du2 / dn_yld;
 
-  const Txy = (F1 * Math.cos(alphaRad)) / (A_II / 100);
-  const Txz = F2 / (A_II / 100);
-  const Tu2 = Math.max(Txy, Txz);
+//   const Txy = (F1 * Math.cos(alphaRad)) / (A_II / 100);
+//   const Txz = F2 / (A_II / 100);
+//   const Tu2 = Math.max(Txy, Txz);
 
-//   const r423 = Tu2 / dn_shrup;
-//   const r424 = Tu2 / dn_shyld;
-  const r425 = r422 + Math.pow(Tu2 / dn_shyld, 2);
-  const uc_II = Math.max(r421, r422, r425);
+  const uc_II = Math.max(r421, r422);
 
   // Section III-III
   const r51 = Tu3 / dn_shrup;
@@ -537,13 +534,6 @@ export default function PadeyeCalculator() {
                   label="(4.2-2) Tensile Yielding"
                   formula="δn = 0.6·Fy"
                   value={r422}
-                  limit={1.0}
-                  isUnity={true}
-                />
-                <CheckBadge
-                  label="(4.2-3) Combined T+S"
-                  formula="(δu/δn) + (Tu/δns)² ≤ 1"
-                  value={r425}
                   limit={1.0}
                   isUnity={true}
                 />
