@@ -1,0 +1,589 @@
+import React, { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+
+// Initial Input State
+const initialInputs = {
+  SLp: 11397, // Sling static load (kG)
+  n: 1.5, // Dynamic load factor
+  Fy: 245, // Yield strength (MPa) (SS400 = 245 MPa ~= 2497 kg/cm2)
+  Fu: 400, // Ultimate strength (MPa)
+  R1: 90, // Padeye main radius (mm)
+  R2: 60, // Cheek plate radius (mm)
+  R3: 30, // Pin hole radius (mm)
+  t1: 30, // Main plate thickness (mm)
+  t2: 10, // Cheek plate thickness (mm)
+  H: 90, // Height to pin hole (mm)
+  L: 250, // Base length (mm)
+  alpha: 61, // Sling angle (deg)
+  B: 38.1, // Shackle pin diameter (mm)
+  C: 133, // Shackle inside length (mm)
+  A: 57, // Shackle jaw width (mm)
+  d1: 42, // Sling diameter (mm)
+  G1: 4, // Safety gap (mm)
+  h_wm: 6, // Weld size (mm)
+};
+
+// Render Property Badge
+const PropertyBadge = ({
+  label,
+  formula,
+  value,
+  unit,
+}: {
+  label: string;
+  formula: string;
+  value: number;
+  unit: string;
+}) => (
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-slate-50/50 rounded-lg border border-slate-100 gap-2">
+    <div>
+      <p className="font-medium text-sm text-slate-700">{label}</p>
+      <p className="text-xs text-slate-500 font-mono mt-1">{formula}</p>
+    </div>
+    <div className="text-right">
+      <span className="font-mono font-bold text-amber-600 text-sm">
+        {value.toFixed(2)}
+      </span>
+      <span className="text-xs text-slate-500 ml-1">{unit}</span>
+    </div>
+  </div>
+);
+// Render Check Badge
+const CheckBadge = ({
+  value,
+  label,
+  formula,
+  limit = 0,
+  isUnity = false,
+}: {
+  value: number;
+  label: string;
+  formula?: string;
+  limit?: number;
+  isUnity?: boolean;
+}) => {
+  const isPassing = isUnity ? value <= limit : value > limit;
+  return (
+    <div className="flex items-center justify-between p-3 bg-slate-50/50 rounded-lg border border-slate-100">
+      <div>
+        <p className="font-medium text-sm text-slate-700">{label}</p>
+        {formula && (
+          <p className="text-xs text-slate-400 font-mono mt-1">{formula}</p>
+        )}
+        <p className="text-xs text-slate-500 font-mono mt-1">
+          {isUnity
+            ? `UC: ${value.toFixed(3)} (Limit: ${limit.toFixed(1)})`
+            : `Result: ${value.toFixed(2)} mm (Required > ${limit} mm)`}
+        </p>
+      </div>
+      <Badge
+        variant={isPassing ? "default" : "destructive"}
+        className={isPassing ? "bg-emerald-500 hover:bg-emerald-600" : ""}>
+        {isPassing ? "PASS" : "FAIL"}
+      </Badge>
+    </div>
+  );
+};
+
+export default function PadeyeCalculator() {
+  const [inputs, setInputs] = useState(initialInputs);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInputs((prev) => ({
+      ...prev,
+      [name]: parseFloat(value) || 0,
+    }));
+  };
+
+  // Convert kN to N for calculations, but since Fy is in MPa (N/mm2), and geometric properties are mm,
+  // we first calculate the loads in kG based on the user's inputs
+  const calculatedF1_kG = inputs.n * inputs.SLp;
+  const calculatedF2_kG = 0.05 * inputs.SLp;
+
+  // Convert kG to Newtons (assuming 1 kG = 9.81 N or similar, but the previous code converted 17095.5 kG to ~170955 N, meaning 1 kG = 10 N as standard for lifting or safe bound)
+  // Let's use 1 kG = 10 N as per previous logic (170.955 kN).
+  const F1 = calculatedF1_kG;
+  const F2 = calculatedF2_kG * 10;
+
+  const Fy = inputs.Fy;
+  const Fu = inputs.Fu;
+  const { R1, R2, R3, t1, t2, H, L, alpha, B, C, A, d1, G1, h_wm } = inputs;
+  const alphaRad = alpha * (Math.PI / 180);
+
+  // --- Calculations as per README ---
+
+  // 1. Clearances
+  const pinClearance = 2 * R3 - B;
+  const sideClearance = C + B / 2 - R1 - d1 - G1;
+  const shackleFit = 0.5 * (A - t1 - 2 * t2);
+  const cheekClearance = R1 - R2 - t2;
+
+  // 2. Sections
+  const A_I = 2 * ((R1 - R3) * t1 + 2 * (R2 - R3) * t2);
+  const A_II = L * t1;
+  const A_III = (R1 - R3) * t1 + 2 * (R2 - R3) * t2;
+  const Sz_II = (t1 * L * L) / 6;
+  const Sx_II = (L * t1 * t1) / 6;
+
+  // 3. Allowables
+  const dn_rup = 0.5 * (Fu*10.1972);
+  const dn_yld = 0.6 * (Fy*10.1972);
+  const dn_shrup = 0.3 * Fu;
+  const dn_shyld = 0.4 * (Fy*10.1972);
+  const dn_bear = 0.9 * Fy;
+
+  // 4. Unity Checks
+  // Section I-I
+  const du1 = F1 / (A_I / 100);
+  const r411 = du1 / dn_rup;
+  const r412 = du1 / dn_yld;
+  const Tu3 = F1 / (2 * (A_III/100));
+  const r413 = r412 + Math.pow(Tu3 / dn_shyld, 2);
+  const uc_I = Math.max(r411, r412, r413);
+
+  // Section II-II
+  const du21 = (F1 * Math.sin(alphaRad)) / A_II;
+  const du22 = (F1 * Math.cos(alphaRad) * H) / Sz_II;
+  const du23 = (F2 * H) / Sx_II;
+  const du2 = du21 + du22 + du23;
+
+  const r421 = du2 / dn_rup;
+  const r422 = du2 / dn_yld;
+
+  const Txy = (F1 * Math.cos(alphaRad)) / A_II;
+  const Txz = F2 / A_II;
+  const Tu2 = Math.max(Txy, Txz);
+
+  const r423 = Tu2 / dn_shrup;
+  const r424 = Tu2 / dn_shyld;
+  const r425 = r422 + Math.pow(Tu2 / dn_shyld, 2);
+  const uc_II = Math.max(r421, r422, r423, r424, r425);
+
+  // Section III-III
+  const r51 = Tu3 / dn_shrup;
+  const r52 = Tu3 / dn_shyld;
+  const uc_III = Math.max(r51, r52);
+
+  // Bearing
+  const A_pb = 2 * R3 * (t1 + 2 * t2);
+  const dub = F1 / A_pb;
+  const uc_pb = dub / dn_bear;
+
+  // Weld
+  const l_w = 2 * L;
+  const A_w = 0.707 * l_w * h_wm;
+  const Tuw = F1 / A_w;
+  const Fw = 0.6 * Fy * (1 + 0.5 * Math.pow(Math.abs(Math.sin(alphaRad)), 1.5));
+  const dnw = Fw / 2; // Allowable weld stress
+  const uc_weld = Tuw / dnw;
+
+  const inputGroups = [
+    {
+      title: "Material Properties",
+      fields: [
+        { key: "Fy", label: "Yield Strength Fy (MPa)" },
+        { key: "Fu", label: "Ultimate Strength Fu (MPa)" },
+      ],
+    },
+    {
+      title: "Padeye Geometry",
+      fields: [
+        { key: "R1", label: "Main Radius R1 (mm)" },
+        { key: "R2", label: "Cheek Radius R2 (mm)" },
+        { key: "R3", label: "Pin Hole Radius R3 (mm)" },
+        { key: "t1", label: "Main Thick t1 (mm)" },
+        { key: "t2", label: "Cheek Thick t2 (mm)" },
+        { key: "H", label: "Height H (mm)" },
+        { key: "L", label: "Base Length L (mm)" },
+        { key: "alpha", label: "Sling Angle α (deg)" },
+        { key: "h_wm", label: "Weld Size h_wm (mm)" },
+      ],
+    },
+    {
+      title: "Shackle & Clearance",
+      fields: [
+        { key: "B", label: "Shackle Pin Dia B (mm)" },
+        { key: "C", label: "Shackle Jaw Len C (mm)" },
+        { key: "A", label: "Shackle Jaw Width A (mm)" },
+        { key: "d1", label: "Sling Dia d1 (mm)" },
+        { key: "G1", label: "Safety Gap G1 (mm)" },
+      ],
+    },
+  ];
+
+  const hasFailures =
+    !(pinClearance > 0) ||
+    !(sideClearance > 4) ||
+    !(shackleFit > 0) ||
+    !(cheekClearance > 0) ||
+    !(uc_I <= 1.0) ||
+    !(uc_II <= 1.0) ||
+    !(uc_III <= 1.0) ||
+    !(uc_pb <= 1.0) ||
+    !(uc_weld <= 1.0);
+
+  return (
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full font-sans">
+      {/* INPUTS COLUMN */}
+      <div className="lg:col-span-4 lg:col-start-2 xl:col-span-3 xl:col-start-3 space-y-6">
+        {/* LOADS CARD (Standard Theme) */}
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <CardTitle className="text-lg font-bold text-slate-800">
+              Loads
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4">
+            <div className="space-y-4 border-b border-slate-100 pb-4 mb-4">
+              <div className="space-y-2">
+                <Label
+                  htmlFor="SLp"
+                  className="text-[10px] uppercase font-bold text-slate-500">
+                  Sling static load SLp
+                </Label>
+                <div className="flex relative">
+                  <Input
+                    id="SLp"
+                    name="SLp"
+                    type="number"
+                    value={inputs.SLp}
+                    onChange={handleChange}
+                    className="font-mono h-8 bg-slate-50 border-slate-200 focus-visible:ring-blue-500 shadow-none text-xs pr-8"
+                  />
+                  <span className="absolute right-3 top-2 text-[10px] text-slate-400 font-bold">
+                    kG
+                  </span>
+                </div>
+                <p className="text-[10px] text-slate-400 mt-1 font-mono">
+                  Max(Fdi_5,6)
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <Label
+                  htmlFor="n"
+                  className="text-[10px] uppercase font-bold text-slate-500">
+                  Dynamic load factor n
+                </Label>
+                <div className="flex relative">
+                  <Input
+                    id="n"
+                    name="n"
+                    type="number"
+                    value={inputs.n}
+                    onChange={handleChange}
+                    className="font-mono h-8 bg-slate-50 border-slate-200 focus-visible:ring-blue-500 shadow-none text-xs pr-8"
+                  />
+                  <span className="absolute right-3 top-2 text-[10px] text-slate-400 font-bold">
+                    —
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Computed Results */}
+            <div className="space-y-2 bg-slate-50/50 p-3 rounded-lg border border-slate-100">
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-mono text-slate-500">
+                  F1 = n &times; SLp
+                </span>
+                <span className="font-mono font-bold text-amber-600">
+                  {calculatedF1_kG.toFixed(2)}{" "}
+                  <span className="text-[10px] text-slate-400 font-normal">
+                    kG
+                  </span>
+                </span>
+              </div>
+              <div className="flex justify-between items-center text-xs">
+                <span className="font-mono text-slate-500">
+                  F2 = 5% &times; SLp{" "}
+                  <span className="text-[10px]">[Sec 2.4.2]</span>
+                </span>
+                <span className="font-mono font-bold text-amber-600">
+                  {calculatedF2_kG.toFixed(2)}{" "}
+                  <span className="text-[10px] text-slate-400 font-normal">
+                    kG
+                  </span>
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {inputGroups.map((group) => (
+          <Card
+            key={group.title}
+            className="shadow-sm">
+            <CardHeader className="pb-3 border-b border-slate-100">
+              <CardTitle className="text-lg font-bold text-slate-800">
+                {group.title}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <div className="grid grid-cols-2 gap-4">
+                {group.fields.map((field) => (
+                  <div
+                    key={field.key}
+                    className="space-y-2">
+                    <Label
+                      htmlFor={field.key}
+                      className="text-[10px] uppercase font-bold text-slate-500">
+                      {field.label}
+                    </Label>
+                    <Input
+                      id={field.key}
+                      name={field.key}
+                      type="number"
+                      value={inputs[field.key as keyof typeof inputs]}
+                      onChange={handleChange}
+                      className="font-mono h-8 bg-slate-50 border-slate-200 focus-visible:ring-blue-500 shadow-none text-xs"
+                    />
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* RESULTS COLUMN */}
+      <div className="lg:col-span-6 xl:col-span-5 space-y-6">
+        {hasFailures ? (
+          <Alert
+            variant="destructive"
+            className="bg-red-50 border-red-200 text-red-800 shadow-sm">
+            <AlertCircle className="h-5 w-5 text-red-600!" />
+            <AlertTitle className="font-bold text-red-800">
+              Safety Warning
+            </AlertTitle>
+            <AlertDescription className="text-red-700 font-medium">
+              One or more dimension checks or capacity checks are failing.
+              Please adjust your parameters.
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <Alert className="bg-emerald-50 border-emerald-200 text-emerald-800 shadow-sm">
+            <CheckCircle2 className="h-5 w-5 text-emerald-600!" />
+            <AlertTitle className="font-bold text-emerald-800">
+              All Checks Passing
+            </AlertTitle>
+            <AlertDescription className="text-emerald-700 font-medium">
+              The padeye dimensions and capacity are structurally adequate.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <CardTitle className="text-lg font-bold text-slate-800">
+              1. Dimension and Clearance Checks
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+            <CheckBadge
+              label="Pin Clearance"
+              value={pinClearance}
+              limit={0}
+            />
+            <CheckBadge
+              label="Side Clearance"
+              value={sideClearance}
+              limit={4}
+            />
+            <CheckBadge
+              label="Shackle Fit"
+              value={shackleFit}
+              limit={0}
+            />
+            <CheckBadge
+              label="Cheek Clearance"
+              value={cheekClearance}
+              limit={0}
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <CardTitle className="text-lg font-bold text-slate-800">
+              Cross Section Properties
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 grid grid-cols-1 gap-3">
+            <PropertyBadge
+              label="Area A_I-I"
+              formula="2×((R1-R3)×t1 + 2×(R2-R3)×t2)"
+              value={A_I / 100}
+              unit="cm²"
+            />
+            <PropertyBadge
+              label="Area A_II-II"
+              formula="L × t1"
+              value={A_II / 100}
+              unit="cm²"
+            />
+            <PropertyBadge
+              label="Area A_III-III"
+              formula="(R1-R3)×t1 + 2×(R2-R3)×t2"
+              value={A_III / 100}
+              unit="cm²"
+            />
+            <PropertyBadge
+              label="Section Modulus Sz_II-II"
+              formula="t1 × L² / 6"
+              value={Sz_II / 1000}
+              unit="cm³"
+            />
+            <PropertyBadge
+              label="Section Modulus Sx_II-II"
+              formula="L × t1² / 6"
+              value={Sx_II / 1000}
+              unit="cm³"
+            />
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-sm">
+          <CardHeader className="pb-3 border-b border-slate-100">
+            <CardTitle className="text-lg font-bold text-slate-800">
+              2. Strength Unity Checks
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 flex flex-col gap-5">
+            {/* 4.1 Section I-I */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b pb-1">
+                4.1 — Check Tensile Strength • Section I-I
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                <PropertyBadge
+                  label="Required stress δu"
+                  formula="F1 / A_I-I"
+                  value={du1}
+                  unit="kG/cm²"
+                  />
+                <CheckBadge
+                  label="(4.1-1) Tensile Rupture"
+                  formula="δn = 0.5·Fu (Ωt=2)"
+                  value={r411}
+                  limit={1.0}
+                  isUnity={true}
+                  />
+                <CheckBadge
+                  label="(4.1-2) Tensile Yielding"
+                  formula="δn = 0.6·Fy (Ωt=1.67)"
+                  value={r412}
+                  limit={1.0}
+                  isUnity={true}
+                  />
+                <CheckBadge
+                  label="(4.1-3) Combined T+S"
+                  formula="(δu/δn) + (Tu/δns)² ≤ 1"
+                  value={r413}
+                  limit={1.0}
+                  isUnity={true}
+                />
+              </div>
+            </div>
+
+            {/* 4.2 Section II-II */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b pb-1">
+                4.2 - Check Tensile Strength • Section II-II
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                <CheckBadge
+                  label="(4.2-1) Tensile Rupture"
+                  value={r421}
+                  limit={1.0}
+                  isUnity={true}
+                />
+                <CheckBadge
+                  label="(4.2-2) Tensile Yielding"
+                  value={r422}
+                  limit={1.0}
+                  isUnity={true}
+                />
+                <CheckBadge
+                  label="(4.2-3) Shear Rupture"
+                  value={r423}
+                  limit={1.0}
+                  isUnity={true}
+                />
+                <CheckBadge
+                  label="(4.2-4) Shear Yielding"
+                  value={r424}
+                  limit={1.0}
+                  isUnity={true}
+                />
+                <CheckBadge
+                  label="(4.2-5) Combined T+S"
+                  value={r425}
+                  limit={1.0}
+                  isUnity={true}
+                />
+              </div>
+            </div>
+
+            {/* 5 Section III-III */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b pb-1">
+                5 - Check Shear Strength • Section III-III
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                <CheckBadge
+                  label="(5-1) Shear Rupture"
+                  value={r51}
+                  limit={1.0}
+                  isUnity={true}
+                />
+                <CheckBadge
+                  label="(5-2) Shear Yielding"
+                  value={r52}
+                  limit={1.0}
+                  isUnity={true}
+                />
+              </div>
+            </div>
+
+            {/* 6 Bearing */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b pb-1">
+                6 - Check Bearing Strength
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                <CheckBadge
+                  label="(6-1) Bearing Strength"
+                  value={uc_pb}
+                  limit={1.0}
+                  isUnity={true}
+                />
+              </div>
+            </div>
+
+            {/* 7 Weld */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b pb-1">
+                7 - Check Weld Stress
+              </h3>
+              <div className="grid grid-cols-1 gap-2">
+                <CheckBadge
+                  label="(7-2) Weld Stress"
+                  value={uc_weld}
+                  limit={1.0}
+                  isUnity={true}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
