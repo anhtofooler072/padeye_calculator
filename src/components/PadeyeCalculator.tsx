@@ -10,7 +10,6 @@ import { PadeyePDFReport } from "./PadeyePDFReport";
 import {
   Dialog,
   DialogContent,
-  
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -651,18 +650,22 @@ export default function PadeyeCalculator() {
         <div className="flex justify-end relative z-10 block">
           <Dialog>
             <DialogTrigger className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-600 text-white hover:bg-amber-700 h-10 px-4 py-2">
-                <Eye className="mr-2 h-4 w-4" />
-                Preview & Export PDF
+              <Eye className="mr-2 h-4 w-4" />
+              Preview & Export PDF
             </DialogTrigger>
             <DialogContent className="max-w-7xl xl:max-w-[1400px] w-[95vw] md:w-[90vw] h-[90vh] flex flex-col p-0 overflow-hidden">
               <DialogHeader className="px-6 py-4 border-b shrink-0 flex flex-row items-center">
                 <div>
-                  <DialogTitle className="text-left font-bold text-lg">PDF Report Preview</DialogTitle>
+                  <DialogTitle className="text-left font-bold text-lg">
+                    PDF Report Preview
+                  </DialogTitle>
                 </div>
-                
               </DialogHeader>
               <div className="flex-1 w-full bg-muted/30">
-                <PDFViewer width="100%" height="100%" className="border-0">
+                <PDFViewer
+                  width="100%"
+                  height="100%"
+                  className="border-0">
                   <PadeyePDFReport
                     inputs={inputs}
                     loads={{ F1, F2 }}
