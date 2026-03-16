@@ -40,16 +40,16 @@ const PropertyBadge = ({
   value: number;
   unit: string;
 }) => (
-  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-slate-50/50 rounded-lg border border-slate-100 gap-2">
+  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-muted/50 rounded-lg border border-border/50 gap-2">
     <div>
-      <p className="font-medium text-sm text-slate-700">{label}</p>
-      <p className="text-xs text-slate-500 font-mono mt-1">{formula}</p>
+      <p className="font-medium text-sm text-foreground">{label}</p>
+      <p className="text-xs text-muted-foreground font-mono mt-1">{formula}</p>
     </div>
     <div className="text-right">
-      <span className="font-mono font-bold text-amber-600 text-sm">
+      <span className="font-mono font-bold text-amber-600 dark:text-amber-500 text-sm">
         {value.toFixed(2)}
       </span>
-      <span className="text-xs text-slate-500 ml-1">{unit}</span>
+      <span className="text-xs text-muted-foreground ml-1">{unit}</span>
     </div>
   </div>
 );
@@ -69,13 +69,13 @@ const CheckBadge = ({
 }) => {
   const isPassing = isUnity ? value <= limit : value > limit;
   return (
-    <div className="flex items-center justify-between p-3 bg-slate-50/50 rounded-lg border border-slate-100">
+    <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg border border-border/50">
       <div>
-        <p className="font-medium text-sm text-slate-700">{label}</p>
+        <p className="font-medium text-sm text-foreground">{label}</p>
         {formula && (
-          <p className="text-xs text-slate-400 font-mono mt-1">{formula}</p>
+          <p className="text-xs text-muted-foreground font-mono mt-1">{formula}</p>
         )}
-        <p className="text-xs text-slate-500 font-mono mt-1">
+        <p className="text-xs text-muted-foreground font-mono mt-1">
           {isUnity
             ? `UC: ${value.toFixed(3)} (Limit: ${limit.toFixed(1)})`
             : `Result: ${value.toFixed(2)} mm (Required > ${limit} mm)`}
@@ -246,17 +246,17 @@ export default function PadeyeCalculator() {
       <div className="lg:col-span-4 xl:col-span-4 space-y-6">
         {/* LOADS CARD (Standard Theme) */}
         <Card className="shadow-sm">
-          <CardHeader className="pb-3 border-b border-slate-100">
-            <CardTitle className="text-lg font-bold text-slate-800">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <CardTitle className="text-lg font-bold text-foreground">
               Loads
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4">
-            <div className="space-y-4 border-b border-slate-100 pb-4 mb-4">
+            <div className="space-y-4 border-b border-border/50 pb-4 mb-4">
               <div className="space-y-2">
                 <Label
                   htmlFor="SLp"
-                  className="text-[10px] uppercase font-bold text-slate-500">
+                  className="text-[10px] uppercase font-bold text-muted-foreground">
                   Sling static load SLp
                 </Label>
                 <div className="flex relative">
@@ -266,13 +266,13 @@ export default function PadeyeCalculator() {
                     type="number"
                     value={inputs.SLp}
                     onChange={handleChange}
-                    className="font-mono h-8 bg-slate-50 border-slate-200 focus-visible:ring-blue-500 shadow-none text-xs pr-8"
+                    className="font-mono h-8 bg-muted border-border focus-visible:ring-ring shadow-none text-xs pr-8"
                   />
-                  <span className="absolute right-3 top-2 text-[10px] text-slate-400 font-bold">
+                  <span className="absolute right-3 top-2 text-[10px] text-muted-foreground font-bold">
                     kG
                   </span>
                 </div>
-                <p className="text-[10px] text-slate-400 mt-1 font-mono">
+                <p className="text-[10px] text-muted-foreground mt-1 font-mono">
                   Max(Fdi_5,6)
                 </p>
               </div>
@@ -280,7 +280,7 @@ export default function PadeyeCalculator() {
               <div className="space-y-2">
                 <Label
                   htmlFor="n"
-                  className="text-[10px] uppercase font-bold text-slate-500">
+                  className="text-[10px] uppercase font-bold text-muted-foreground">
                   Dynamic load factor n
                 </Label>
                 <div className="flex relative">
@@ -290,9 +290,9 @@ export default function PadeyeCalculator() {
                     type="number"
                     value={inputs.n}
                     onChange={handleChange}
-                    className="font-mono h-8 bg-slate-50 border-slate-200 focus-visible:ring-blue-500 shadow-none text-xs pr-8"
+                    className="font-mono h-8 bg-muted border-border focus-visible:ring-ring shadow-none text-xs pr-8"
                   />
-                  <span className="absolute right-3 top-2 text-[10px] text-slate-400 font-bold">
+                  <span className="absolute right-3 top-2 text-[10px] text-muted-foreground font-bold">
                     —
                   </span>
                 </div>
@@ -300,26 +300,26 @@ export default function PadeyeCalculator() {
             </div>
 
             {/* Computed Results */}
-            <div className="space-y-2 bg-slate-50/50 p-3 rounded-lg border border-slate-100">
+            <div className="space-y-2 bg-muted/50 p-3 rounded-lg border border-border/50">
               <div className="flex justify-between items-center text-xs">
-                <span className="font-mono text-slate-500">
+                <span className="font-mono text-muted-foreground">
                   F1 = n &times; SLp
                 </span>
-                <span className="font-mono font-bold text-amber-600">
+                <span className="font-mono font-bold text-amber-600 dark:text-amber-500">
                   {calculatedF1_kG.toFixed(2)}{" "}
-                  <span className="text-[10px] text-slate-400 font-normal">
+                  <span className="text-[10px] text-muted-foreground font-normal">
                     kG
                   </span>
                 </span>
               </div>
               <div className="flex justify-between items-center text-xs">
-                <span className="font-mono text-slate-500">
+                <span className="font-mono text-muted-foreground">
                   F2 = 5% &times; SLp{" "}
                   <span className="text-[10px]">[Sec 2.4.2]</span>
                 </span>
-                <span className="font-mono font-bold text-amber-600">
+                <span className="font-mono font-bold text-amber-600 dark:text-amber-500">
                   {calculatedF2_kG.toFixed(2)}{" "}
-                  <span className="text-[10px] text-slate-400 font-normal">
+                  <span className="text-[10px] text-muted-foreground font-normal">
                     kG
                   </span>
                 </span>
@@ -332,8 +332,8 @@ export default function PadeyeCalculator() {
           <Card
             key={group.title}
             className="shadow-sm">
-            <CardHeader className="pb-3 border-b border-slate-100">
-              <CardTitle className="text-lg font-bold text-slate-800">
+            <CardHeader className="pb-3 border-b border-border/50">
+              <CardTitle className="text-lg font-bold text-foreground">
                 {group.title}
               </CardTitle>
             </CardHeader>
@@ -345,7 +345,7 @@ export default function PadeyeCalculator() {
                     className="space-y-2">
                     <Label
                       htmlFor={field.key}
-                      className="text-[10px] uppercase font-bold text-slate-500">
+                      className="text-[10px] uppercase font-bold text-muted-foreground">
                       {field.label}
                     </Label>
                     <Input
@@ -354,7 +354,7 @@ export default function PadeyeCalculator() {
                       type="number"
                       value={inputs[field.key as keyof typeof inputs]}
                       onChange={handleChange}
-                      className="font-mono h-8 bg-slate-50 border-slate-200 focus-visible:ring-blue-500 shadow-none text-xs"
+                      className="font-mono h-8 bg-muted border-border focus-visible:ring-ring shadow-none text-xs"
                     />
                   </div>
                 ))}
@@ -367,11 +367,11 @@ export default function PadeyeCalculator() {
       {/* RESULTS COLUMN */}
       <div className="lg:col-span-8 xl:col-span-8 space-y-6">
         {/* SUMMARY CARD */}
-        <Card className="shadow-sm border-slate-100 bg-white">
+        <Card className="shadow-sm border-border/50 bg-card">
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="flex flex-col justify-center space-y-2">
-                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-bold mb-2">
+                <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold mb-2">
                   Maximum Unity Ratio
                 </p>
                 <div
@@ -383,27 +383,27 @@ export default function PadeyeCalculator() {
                     className={`text-lg font-bold tracking-widest uppercase ${maxUC > 1.0 ? "text-red-500" : "text-emerald-500"}`}>
                     {maxUC > 1.0 ? "Structure Fails" : "Structure is Safe"}
                   </p>
-                  <p className="text-sm text-slate-500 font-mono mt-1">
+                  <p className="text-sm text-muted-foreground font-mono mt-1">
                     Governing: {governingUC?.id} — {governingUC?.label}
                   </p>
                 </div>
               </div>
-              <div className="space-y-3 border-l border-slate-100 pl-8">
+              <div className="space-y-3 border-l border-border/50 pl-8">
                 {unityChecks.map((uc) => (
                   <div
                     key={uc.id}
                     className="flex items-center gap-4 text-xs font-mono">
-                    <div className="text-slate-600 w-48 shrink-0 truncate">
+                    <div className="text-muted-foreground w-48 shrink-0 truncate">
                       {uc.id} — {uc.label}
                     </div>
-                    <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="flex-1 h-1.5 bg-muted rounded-full overflow-hidden">
                       <div
                         className={`h-full ${uc.value > 1.0 ? "bg-red-500" : uc.value === maxUC && uc.value <= 1.0 ? "bg-amber-500" : "bg-emerald-500"}`}
                         style={{ width: `${Math.min(uc.value * 100, 100)}%` }}
                       />
                     </div>
                     <div
-                      className={`w-12 text-right ${uc.value === maxUC ? "text-amber-600 font-bold" : uc.value > 1.0 ? "text-red-500" : "text-emerald-600"}`}>
+                      className={`w-12 text-right ${uc.value === maxUC ? "text-amber-600 dark:text-amber-500 font-bold" : uc.value > 1.0 ? "text-red-500" : "text-emerald-600"}`}>
                       {uc.value.toFixed(3)}
                     </div>
                   </div>
@@ -416,31 +416,31 @@ export default function PadeyeCalculator() {
         {hasFailures ? (
           <Alert
             variant="destructive"
-            className="bg-red-50 border-red-200 text-red-800 shadow-sm">
-            <AlertCircle className="h-5 w-5 text-red-600!" />
+            className="bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-900 text-red-800 dark:text-red-200 shadow-sm">
+            <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-500!" />
             <AlertTitle className="font-bold text-red-800">
               Safety Warning
             </AlertTitle>
-            <AlertDescription className="text-red-700 font-medium">
+            <AlertDescription className="text-red-700 dark:text-red-300 font-medium">
               One or more dimension checks or capacity checks are failing.
               Please adjust your parameters.
             </AlertDescription>
           </Alert>
         ) : (
-          <Alert className="bg-emerald-50 border-emerald-200 text-emerald-800 shadow-sm">
-            <CheckCircle2 className="h-5 w-5 text-emerald-600!" />
+          <Alert className="bg-emerald-50 dark:bg-emerald-950 border-emerald-200 dark:border-emerald-900 text-emerald-800 dark:text-emerald-200 shadow-sm">
+            <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-500!" />
             <AlertTitle className="font-bold text-emerald-800">
               All Checks Passing
             </AlertTitle>
-            <AlertDescription className="text-emerald-700 font-medium">
+            <AlertDescription className="text-emerald-700 dark:text-emerald-300 font-medium">
               The padeye dimensions and capacity are structurally adequate.
             </AlertDescription>
           </Alert>
         )}
 
         <Card className="shadow-sm">
-          <CardHeader className="pb-3 border-b border-slate-100">
-            <CardTitle className="text-lg font-bold text-slate-800">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <CardTitle className="text-lg font-bold text-foreground">
               1. Dimension and Clearance Checks
             </CardTitle>
           </CardHeader>
@@ -469,8 +469,8 @@ export default function PadeyeCalculator() {
         </Card>
 
         <Card className="shadow-sm">
-          <CardHeader className="pb-3 border-b border-slate-100">
-            <CardTitle className="text-lg font-bold text-slate-800">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <CardTitle className="text-lg font-bold text-foreground">
               Cross Section Properties
             </CardTitle>
           </CardHeader>
@@ -509,15 +509,15 @@ export default function PadeyeCalculator() {
         </Card>
 
         <Card className="shadow-sm">
-          <CardHeader className="pb-3 border-b border-slate-100">
-            <CardTitle className="text-lg font-bold text-slate-800">
+          <CardHeader className="pb-3 border-b border-border/50">
+            <CardTitle className="text-lg font-bold text-foreground">
               2. Strength Unity Checks
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-4 flex flex-col gap-5">
             {/* 4.1 Section I-I */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b pb-1">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-b pb-1">
                 4.1 — Check Tensile Strength • Section I-I
               </h3>
               <div className="grid grid-cols-1 gap-2">
@@ -553,7 +553,7 @@ export default function PadeyeCalculator() {
 
             {/* 4.2 Section II-II */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b pb-1">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-b pb-1">
                 4.2 - Check Tensile Strength • Section II-II
               </h3>
               <div className="grid grid-cols-1 gap-2">
@@ -600,7 +600,7 @@ export default function PadeyeCalculator() {
 
             {/* 5 Section III-III */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b pb-1">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-b pb-1">
                 5 - Check Shear Strength • Section III-III
               </h3>
               <div className="grid grid-cols-1 gap-2">
@@ -629,7 +629,7 @@ export default function PadeyeCalculator() {
 
             {/* 6 Bearing */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b pb-1">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-b pb-1">
                 6 - Check Bearing Strength
               </h3>
               <div className="grid grid-cols-1 gap-2">
@@ -657,7 +657,7 @@ export default function PadeyeCalculator() {
 
             {/* 7 Weld */}
             <div className="space-y-3">
-              <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest border-b pb-1">
+              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest border-b pb-1">
                 7 - Check Weld Stress
               </h3>
               <div className="grid grid-cols-1 gap-2">
