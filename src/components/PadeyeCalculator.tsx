@@ -4,7 +4,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, FileText } from "lucide-react";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { PadeyePDFReport } from "./PadeyePDFReport";
 import {
   Select,
   SelectContent,
@@ -638,6 +640,39 @@ export default function PadeyeCalculator() {
 
       {/* RESULTS COLUMN */}
       <div className="lg:col-span-8 xl:col-span-8 space-y-6">
+        <div className="flex justify-end">
+          <PDFDownloadLink
+            document={
+              <PadeyePDFReport
+                inputs={inputs}
+                loads={{ F1, F2 }}
+                clearances={{
+                  pinClearance,
+                  sideClearance,
+                  shackleFit,
+                  cheekClearance,
+                }}
+                unityChecks={unityChecks}
+                maxUC={maxUC}
+                governingUC={governingUC}
+                selectedMaterial={selectedMaterial}
+              />
+            }
+            fileName="Padeye_Report.pdf"
+            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-amber-600 text-white hover:bg-amber-700 h-10 px-4 py-2">
+            {({ loading }) =>
+              loading ? (
+                "Generating PDF..."
+              ) : (
+                <>
+                  <FileText className="mr-2 h-4 w-4" />
+                  Export PDF Report
+                </>
+              )
+            }
+          </PDFDownloadLink>
+        </div>
+
         {/* SUMMARY CARD */}
         <Card className="shadow-sm border-border/50 bg-card">
           <CardContent className="p-6">

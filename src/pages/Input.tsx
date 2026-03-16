@@ -18,18 +18,18 @@ export default function Input() {
             Padeye Design{" "}
             <CanvasText
               text="Validation"
-              backgroundClassName="bg-blue-600 dark:bg-blue-700 !text-white"
+              backgroundClassName="bg-orange-500 dark:bg-orange-600 !text-white"
               colors={[
-                "rgba(0, 153, 255, 1)",
-                "rgba(0, 153, 255, 0.9)",
-                "rgba(0, 153, 255, 0.8)",
-                "rgba(0, 153, 255, 0.7)",
-                "rgba(0, 153, 255, 0.6)",
-                "rgba(0, 153, 255, 0.5)",
-                "rgba(0, 153, 255, 0.4)",
-                "rgba(0, 153, 255, 0.3)",
-                "rgba(0, 153, 255, 0.2)",
-                "rgba(0, 153, 255, 0.1)",
+                "rgba(249, 115, 22, 1)",
+                "rgba(249, 115, 22, 0.9)",
+                "rgba(249, 115, 22, 0.8)",
+                "rgba(249, 115, 22, 0.7)",
+                "rgba(249, 115, 22, 0.6)",
+                "rgba(249, 115, 22, 0.5)",
+                "rgba(249, 115, 22, 0.4)",
+                "rgba(249, 115, 22, 0.3)",
+                "rgba(249, 115, 22, 0.2)",
+                "rgba(249, 115, 22, 0.1)",
               ]}
               lineGap={4}
               animationDuration={20}
