@@ -9,8 +9,14 @@ interface PadeyeParams {
   cheekThk: number;
 }
 
-const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
-  const PAD_CANVAS = 400; // px
+const PadeyeSide = ({
+  params,
+  padCanvas,
+}: {
+  params: PadeyeParams;
+  padCanvas: number;
+}) => {
+  const PAD_CANVAS = padCanvas; // px
 
   // Derived dimensions to match exact front view scale
   const radius = params.width / 2;
@@ -60,7 +66,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
               height={cheekHeight * scale}
               stroke="#334155"
               strokeWidth={2}
-              fill="#bbf7d0" // Light green
+              fill="#cbd5e1" // Light green
             />
 
             {/* Main Plate */}
@@ -71,7 +77,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
               height={mainHeight * scale}
               stroke="#334155"
               strokeWidth={2}
-              fill="#fecdd3" // Light red / pinkish
+              fill="#e2e8f0" // Light red / pinkish
             />
 
             {/* Right Cheek Plate */}
@@ -82,7 +88,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
               height={cheekHeight * scale}
               stroke="#334155"
               strokeWidth={2}
-              fill="#bbf7d0" // Light green
+              fill="#cbd5e1" // Light green
             />
 
             {/* --- Center Line (Pin Hole Axis) --- */}
@@ -107,7 +113,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 params.cheekThk * scale,
                 -25,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
               dash={[4, 4]}
             />
@@ -118,7 +124,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 (params.cheekThk + params.mainThk) * scale,
                 -25,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
               dash={[4, 4]}
             />
@@ -129,7 +135,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 (params.cheekThk + params.mainThk) * scale,
                 -20,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
               lineCap="round"
             />
@@ -140,7 +146,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 params.cheekThk * scale,
                 -16,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
             />
             <Line
@@ -150,7 +156,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 (params.cheekThk + params.mainThk) * scale,
                 -16,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
             />
             <Text
@@ -158,7 +164,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
               x={(params.cheekThk + params.mainThk / 2) * scale - 20}
               y={-35}
               fontSize={12}
-              fill="#0ea5e9"
+              fill="#64748b"
             />
 
             {/* --- Cheek Plate Annotation --- */}
@@ -170,7 +176,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 (params.cheekThk + params.mainThk) * scale,
                 -50,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
               dash={[4, 4]}
             />
@@ -181,7 +187,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 (params.cheekThk * 2 + params.mainThk) * scale,
                 -50,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
               dash={[4, 4]}
             />
@@ -192,7 +198,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 (params.cheekThk + params.mainThk) * scale,
                 -45,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
               lineCap="round"
             />
@@ -203,7 +209,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 (params.cheekThk + params.mainThk) * scale,
                 -41,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
             />
             <Line
@@ -213,7 +219,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 (params.cheekThk * 2 + params.mainThk) * scale,
                 -41,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
             />
             <Text
@@ -221,7 +227,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
               x={(params.cheekThk * 1.5 + params.mainThk) * scale - 20}
               y={-60}
               fontSize={12}
-              fill="#0ea5e9"
+              fill="#64748b"
             />
 
             {/* Full Width Line Annotation */}
@@ -232,7 +238,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 totalDrawingWidthSide * scale,
                 mainHeight * scale + 20,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
               pointerLength={6}
               pointerWidth={6}
@@ -240,7 +246,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
             />
             <Line
               points={[0, mainHeight * scale + 16, 0, mainHeight * scale + 24]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
             />
             <Line
@@ -250,7 +256,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
                 totalDrawingWidthSide * scale,
                 mainHeight * scale + 24,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
             />
             <Text
@@ -258,7 +264,7 @@ const PadeyeSide = ({ params }: { params: PadeyeParams }) => {
               x={(totalDrawingWidthSide * scale) / 2 - 50}
               y={mainHeight * scale + 30}
               fontSize={12}
-              fill="#0ea5e9"
+              fill="#64748b"
             />
           </Group>
         </Layer>

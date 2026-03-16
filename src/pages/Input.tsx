@@ -3,6 +3,8 @@ import PadeyeDraft from "../components/konva/Padeye";
 import PadeyeSide from "../components/konva/PadeyeSide";
 
 export default function Input() {
+  const PAD_CANVAS = 300; // Shared canvas size for both views
+
   const [params, setParams] = useState({
     width: 180, // Total width of the plate (main plate diameter)
     baseHeight: 120, // Height of the straight rectangular section
@@ -201,11 +203,17 @@ export default function Input() {
             <span className="text-slate-600 font-semibold mb-3">
               Front View
             </span>
-            <PadeyeDraft params={params} />
+            <PadeyeDraft
+              params={params}
+              padCanvas={PAD_CANVAS}
+            />
           </div>
           <div className="flex flex-col items-center">
             <span className="text-slate-600 font-semibold mb-3">Side View</span>
-            <PadeyeSide params={params} />
+            <PadeyeSide
+              params={params}
+              padCanvas={PAD_CANVAS}
+            />
           </div>
         </div>
       </main>

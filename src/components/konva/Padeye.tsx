@@ -18,14 +18,20 @@ interface PadeyeParams {
   cheekThk: number;
 }
 
-const PadeyeDraft = ({ params }: { params: PadeyeParams }) => {
+const PadeyeDraft = ({
+  params,
+  padCanvas,
+}: {
+  params: PadeyeParams;
+  padCanvas: number;
+}) => {
   // Derived Values
   const radius = params.width / 2;
   const holeRadius = params.holeDia / 2;
   const cheekRadius = params.cheekDia / 2;
 
   // Normalization logic
-  const PAD_CANVAS = 400; // px
+  const PAD_CANVAS = padCanvas; // px
 
   // Calculate actual bounding dimensions of the Padeye shape
   // Top arc goes up by `radius`, base goes down to `baseHeight`
@@ -69,7 +75,7 @@ const PadeyeDraft = ({ params }: { params: PadeyeParams }) => {
               data={`M 0 ${params.baseHeight * scale} L 0 0 A ${radius * scale} ${radius * scale} 0 0 1 ${params.width * scale} 0 L ${params.width * scale} ${params.baseHeight * scale} Z`}
               stroke="#334155"
               strokeWidth={2}
-              fill="#f8fafc"
+              fill="#e2e8f0"
             />
 
             {/* 3. The Shackle Hole */}
@@ -154,7 +160,7 @@ const PadeyeDraft = ({ params }: { params: PadeyeParams }) => {
                 params.width * scale,
                 params.baseHeight * scale + 20,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
               pointerLength={6}
               pointerWidth={6}
@@ -168,7 +174,7 @@ const PadeyeDraft = ({ params }: { params: PadeyeParams }) => {
                 0,
                 params.baseHeight * scale + 24,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
             />
             <Line
@@ -178,7 +184,7 @@ const PadeyeDraft = ({ params }: { params: PadeyeParams }) => {
                 params.width * scale,
                 params.baseHeight * scale + 24,
               ]}
-              stroke="#0ea5e9"
+              stroke="#64748b"
               strokeWidth={1}
             />
             {/* Width label */}
@@ -187,7 +193,7 @@ const PadeyeDraft = ({ params }: { params: PadeyeParams }) => {
               x={(params.width * scale) / 2 - 40}
               y={params.baseHeight * scale + 25}
               fontSize={12}
-              fill="#0ea5e9"
+              fill="#64748b"
             />
 
             {/* --- Height Annotation (Base Height) --- */}
@@ -198,7 +204,7 @@ const PadeyeDraft = ({ params }: { params: PadeyeParams }) => {
                 params.width * scale + 20,
                 params.baseHeight * scale,
               ]}
-              stroke="#f59e42"
+              stroke="#64748b"
               strokeWidth={1}
               pointerLength={6}
               pointerWidth={6}
@@ -212,7 +218,7 @@ const PadeyeDraft = ({ params }: { params: PadeyeParams }) => {
                 params.width * scale + 24,
                 0,
               ]}
-              stroke="#f59e42"
+              stroke="#64748b"
               strokeWidth={1}
             />
             <Line
@@ -222,7 +228,7 @@ const PadeyeDraft = ({ params }: { params: PadeyeParams }) => {
                 params.width * scale + 24,
                 params.baseHeight * scale,
               ]}
-              stroke="#f59e42"
+              stroke="#64748b"
               strokeWidth={1}
             />
             {/* Height label */}
@@ -231,7 +237,7 @@ const PadeyeDraft = ({ params }: { params: PadeyeParams }) => {
               x={params.width * scale + 40}
               y={(params.baseHeight * scale) / 2 - 10}
               fontSize={12}
-              fill="#f59e42"
+              fill="#64748b"
               rotation={90}
             />
           </Group>
