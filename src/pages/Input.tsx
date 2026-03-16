@@ -1,6 +1,5 @@
 import { useState } from "react";
-import PadeyeDraft from "../components/konva/Padeye";
-import PadeyeSide from "../components/konva/PadeyeSide";
+import CombinedPadeye from "../components/konva/CombinedPadeye";
 
 export default function Input() {
   const PAD_CANVAS = 300; // Shared canvas size for both views
@@ -198,24 +197,10 @@ export default function Input() {
         <h2 className="text-2xl font-bold text-slate-800 self-start mb-2">
           Padeye Visualization
         </h2>
-        <div className="flex flex-row gap-10 items-center justify-center w-full">
-          <div className="flex flex-col items-center">
-            <span className="text-slate-600 font-semibold mb-3">
-              Front View
-            </span>
-            <PadeyeDraft
-              params={params}
-              padCanvas={PAD_CANVAS}
-            />
-          </div>
-          <div className="flex flex-col items-center">
-            <span className="text-slate-600 font-semibold mb-3">Side View</span>
-            <PadeyeSide
-              params={params}
-              padCanvas={PAD_CANVAS}
-            />
-          </div>
-        </div>
+        <CombinedPadeye
+          params={params}
+          padCanvas={PAD_CANVAS}
+        />
       </main>
     </div>
   );
