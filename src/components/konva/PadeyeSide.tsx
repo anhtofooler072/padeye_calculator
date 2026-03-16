@@ -8,6 +8,7 @@ import {
   // Arc,
   Path,
   Circle,
+  Arrow,
 } from "react-konva";
 
 interface PadeyeParams {
@@ -261,10 +262,25 @@ const PadeyeSide = ({
                 />
                 <Text
                   text={`A = ${params.shackleA} mm`}
-                  x={cx * scale - 30}
-                  y={(annLabelY + 5) * scale}
+                  x={(cx - params.shackleA! / 2) * scale - 75}
+                  y={annLabelY * scale - 5}
                   fontSize={11}
                   fill="#d97706"
+                />
+
+                {/* Arrow connecting the A Text to the Dimension Line */}
+                <Arrow
+                  points={[
+                    (cx - params.shackleA! / 2) * scale - 15,
+                    annLabelY * scale,
+                    (cx - params.shackleA! / 2) * scale,
+                    annLabelY * scale,
+                  ]}
+                  stroke="#f59e0b"
+                  fill="#f59e0b"
+                  strokeWidth={1}
+                  pointerLength={5}
+                  pointerWidth={4}
                 />
 
                 {/* Shackle Inside Length (C) Annotation */}
