@@ -144,7 +144,7 @@ export default function PadeyeCalculator() {
   const r412 = du1 / dn_yld;
   const Tu3 = F1 / (2 * (A_III / 100));
   const r413 = r412 + Math.pow(Tu3 / dn_shyld, 2);
-  const uc_I = Math.max(r411, r412, r413);
+  // const uc_I = Math.max(r411, r412, r413);
 
   // Section II-II
   const du21 = (F1 * Math.sin(alphaRad)) / (A_II / 100);
@@ -157,16 +157,16 @@ export default function PadeyeCalculator() {
   const r421 = du2 / dn_rup;
   const r422 = du2 / dn_yld;
 
-//   const Txy = (F1 * Math.cos(alphaRad)) / (A_II / 100);
-//   const Txz = F2 / (A_II / 100);
-//   const Tu2 = Math.max(Txy, Txz);
+  //   const Txy = (F1 * Math.cos(alphaRad)) / (A_II / 100);
+  //   const Txz = F2 / (A_II / 100);
+  //   const Tu2 = Math.max(Txy, Txz);
 
-  const uc_II = Math.max(r421, r422);
+  // const uc_II = Math.max(r421, r422);
 
   // Section III-III
   const r51 = Tu3 / dn_shrup;
   const r52 = Tu3 / dn_shyld;
-  const uc_III = Math.max(r51, r52);
+  // const uc_III = Math.max(r51, r52);
 
   // Bearing
   const A_pb = 2 * R3 * (t1 + 2 * t2);
@@ -218,21 +218,32 @@ export default function PadeyeCalculator() {
     },
   ];
 
+  const unityChecks = [
+    { id: "4.1-1", label: "Tensile Rupture (I-I)", value: r411 },
+    { id: "4.1-2", label: "Tensile Yielding (I-I)", value: r412 },
+    { id: "4.1-3", label: "Combined T+S (I-I)", value: r413 },
+    { id: "4.2-1", label: "Tensile Rupture (II-II)", value: r421 },
+    { id: "4.2-2", label: "Tensile Yielding (II-II)", value: r422 },
+    { id: "5-1", label: "Shear Rupture (III-III)", value: r51 },
+    { id: "5-2", label: "Shear Yielding (III-III)", value: r52 },
+    { id: "6-1", label: "Bearing Strength", value: uc_pb },
+    { id: "7-2", label: "Weld Stress", value: uc_weld },
+  ];
+
+  const maxUC = Math.max(...unityChecks.map((uc) => uc.value));
+  const governingUC = unityChecks.find((uc) => uc.value === maxUC);
+
   const hasFailures =
     !(pinClearance > 0) ||
     !(sideClearance > 4) ||
     !(shackleFit > 0) ||
     !(cheekClearance > 0) ||
-    !(uc_I <= 1.0) ||
-    !(uc_II <= 1.0) ||
-    !(uc_III <= 1.0) ||
-    !(uc_pb <= 1.0) ||
-    !(uc_weld <= 1.0);
+    maxUC > 1.0;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 w-full font-sans">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 w-full font-sans">
       {/* INPUTS COLUMN */}
-      <div className="lg:col-span-4 lg:col-start-2 xl:col-span-3 xl:col-start-3 space-y-6">
+      <div className="lg:col-span-4 xl:col-span-4 space-y-6">
         {/* LOADS CARD (Standard Theme) */}
         <Card className="shadow-sm">
           <CardHeader className="pb-3 border-b border-slate-100">
@@ -354,7 +365,54 @@ export default function PadeyeCalculator() {
       </div>
 
       {/* RESULTS COLUMN */}
-      <div className="lg:col-span-6 xl:col-span-5 space-y-6">
+      <div className="lg:col-span-8 xl:col-span-8 space-y-6">
+        {/* SUMMARY CARD */}
+        <Card className="shadow-sm border-slate-100 bg-white">
+          <CardContent className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="flex flex-col justify-center space-y-2">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500 font-bold mb-2">
+                  Maximum Unity Ratio
+                </p>
+                <div
+                  className={`text-6xl font-mono tracking-tighter ${maxUC > 1.0 ? "text-red-500" : "text-emerald-500"}`}>
+                  {maxUC.toFixed(3)}
+                </div>
+                <div className="mt-4">
+                  <p
+                    className={`text-lg font-bold tracking-widest uppercase ${maxUC > 1.0 ? "text-red-500" : "text-emerald-500"}`}>
+                    {maxUC > 1.0 ? "Structure Fails" : "Structure is Safe"}
+                  </p>
+                  <p className="text-sm text-slate-500 font-mono mt-1">
+                    Governing: {governingUC?.id} — {governingUC?.label}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-3 border-l border-slate-100 pl-8">
+                {unityChecks.map((uc) => (
+                  <div
+                    key={uc.id}
+                    className="flex items-center gap-4 text-xs font-mono">
+                    <div className="text-slate-600 w-48 shrink-0 truncate">
+                      {uc.id} — {uc.label}
+                    </div>
+                    <div className="flex-1 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full ${uc.value > 1.0 ? "bg-red-500" : uc.value === maxUC && uc.value <= 1.0 ? "bg-amber-500" : "bg-emerald-500"}`}
+                        style={{ width: `${Math.min(uc.value * 100, 100)}%` }}
+                      />
+                    </div>
+                    <div
+                      className={`w-12 text-right ${uc.value === maxUC ? "text-amber-600 font-bold" : uc.value > 1.0 ? "text-red-500" : "text-emerald-600"}`}>
+                      {uc.value.toFixed(3)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {hasFailures ? (
           <Alert
             variant="destructive"
