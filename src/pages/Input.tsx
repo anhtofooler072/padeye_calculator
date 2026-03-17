@@ -11,6 +11,10 @@ export default function Input() {
     cheekDia: 70, // Diameter of cheek plate
     mainThk: 30, // Main plate thickness
     cheekThk: 20, // Cheek plate thickness
+    shackleA: 80,
+    shackleB: 38.1,
+    shackleC: 133,
+    slingD: 30,
   });
 
   const [draftParams, setDraftParams] = useState({
@@ -20,6 +24,10 @@ export default function Input() {
     cheekDia: "70",
     mainThk: "30",
     cheekThk: "20",
+    shackleA: "80",
+    shackleB: "38.1",
+    shackleC: "133",
+    slingD: "30",
   });
 
   const handleGenerate = () => {
@@ -29,6 +37,10 @@ export default function Input() {
     let newBaseHeight = Number(draftParams.baseHeight) || 120;
     const newMainThk = Number(draftParams.mainThk) || 30;
     const newCheekThk = Number(draftParams.cheekThk) || 20;
+    const newShackleA = Number(draftParams.shackleA) || 80;
+    const newShackleB = Number(draftParams.shackleB) || 38.1;
+    const newShackleC = Number(draftParams.shackleC) || 133;
+    const newSlingD = Number(draftParams.slingD) || 30;
 
     // Apply basic visual constraints
     const minCheekDia = newHoleDia + 20;
@@ -47,6 +59,10 @@ export default function Input() {
       cheekDia: newCheekDia,
       mainThk: Math.max(1, newMainThk),
       cheekThk: Math.max(1, newCheekThk),
+      shackleA: newShackleA,
+      shackleB: newShackleB,
+      shackleC: newShackleC,
+      slingD: newSlingD,
     });
 
     setDraftParams({
@@ -56,6 +72,10 @@ export default function Input() {
       cheekDia: newCheekDia.toString(),
       mainThk: Math.max(1, newMainThk).toString(),
       cheekThk: Math.max(1, newCheekThk).toString(),
+      shackleA: newShackleA.toString(),
+      shackleB: newShackleB.toString(),
+      shackleC: newShackleC.toString(),
+      slingD: newSlingD.toString(),
     });
   };
 
@@ -178,6 +198,86 @@ export default function Input() {
                 setDraftParams({ ...draftParams, cheekThk: e.target.value })
               }
               className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-700 transition-shadow"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
+              mm
+            </span>
+          </div>
+        </div>
+
+        {/* Shackle Inside Width (A) Input */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+            Shackle Width (A)
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              value={draftParams.shackleA}
+              onChange={(e) =>
+                setDraftParams({ ...draftParams, shackleA: e.target.value })
+              }
+              className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-slate-700 transition-shadow"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
+              mm
+            </span>
+          </div>
+        </div>
+
+        {/* Shackle Inside Length (C) Input */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+            Shackle Length (C)
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              value={draftParams.shackleC}
+              onChange={(e) =>
+                setDraftParams({ ...draftParams, shackleC: e.target.value })
+              }
+              className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-slate-700 transition-shadow"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
+              mm
+            </span>
+          </div>
+        </div>
+
+        {/* Shackle Pin Dia (B) Input */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+            Shackle Pin Dia (B)
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              value={draftParams.shackleB}
+              onChange={(e) =>
+                setDraftParams({ ...draftParams, shackleB: e.target.value })
+              }
+              className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 text-slate-700 transition-shadow"
+            />
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
+              mm
+            </span>
+          </div>
+        </div>
+
+        {/* Sling Diameter Input */}
+        <div className="flex flex-col gap-1.5">
+          <label className="text-xs uppercase font-bold text-slate-500 tracking-wider">
+            Sling Diameter
+          </label>
+          <div className="relative">
+            <input
+              type="number"
+              value={draftParams.slingD}
+              onChange={(e) =>
+                setDraftParams({ ...draftParams, slingD: e.target.value })
+              }
+              className="w-full border border-slate-300 rounded-md py-2 pl-3 pr-8 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-slate-700 transition-shadow"
             />
             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-medium pointer-events-none">
               mm
