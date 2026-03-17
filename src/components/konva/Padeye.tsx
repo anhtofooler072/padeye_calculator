@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import {
   Stage,
   Layer,
@@ -8,6 +9,7 @@ import {
   Text,
   Arrow,
 } from "react-konva";
+import { useTheme } from "../theme-provider";
 
 interface PadeyeParams {
   width: number;
@@ -21,10 +23,32 @@ interface PadeyeParams {
 const PadeyeDraft = ({
   params,
   padCanvas,
+  onImageReady,
 }: {
   params: PadeyeParams;
   padCanvas: number;
+  onImageReady?: (url: string) => void;
 }) => {
+  const { theme } = useTheme();
+  const stageRef = useRef<any>(null);
+
+  // We determine if it's dark mode either if explicitly 'dark' or if 'system' resolves to 'dark'
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  // Colors
+  const strokeColor = isDark ? "#94a3b8" : "#334155";
+  const mainFill = isDark ? "#334155" : "#e2e8f0";
+  const holeFill = isDark ? "#121212" : "white"; // matching close to neutral-950/background
+  const crosshairColor = isDark ? "#475569" : "#cbd5e1";
+  const textColor = isDark ? "#94a3b8" : "#64748b";
+  const canvasBgClass = isDark
+    ? "bg-neutral-900 border-neutral-800"
+    : "bg-white border-slate-200";
+
   // Derived Values
   const radius = params.width / 2;
   const holeRadius = params.holeDia / 2;
@@ -61,11 +85,24 @@ const PadeyeDraft = ({
   //   const centerX = radius;
   //   const centerY = radius;
 
+  // Render to DataURL whenever params or layout changes
+  useEffect(() => {
+    if (onImageReady && stageRef.current) {
+      // Small timeout ensures the stage is fully rendered
+      setTimeout(() => {
+        if (stageRef.current) {
+          onImageReady(stageRef.current.toDataURL({ pixelRatio: 2 }));
+        }
+      }, 500);
+    }
+  }, [params, PAD_CANVAS, onImageReady, theme, isDark]);
+
   return (
-    <div className="bg-white p-4 rounded shadow-inner border border-slate-200">
+    <div className={`p-4 rounded shadow-inner border ${canvasBgClass}`}>
       <Stage
         width={PAD_CANVAS}
-        height={PAD_CANVAS}>
+        height={PAD_CANVAS}
+        ref={stageRef}>
         <Layer>
           <Group
             x={offsetX}
@@ -73,9 +110,9 @@ const PadeyeDraft = ({
             {/* 1 & 2. The Main Padeye Body (Combined Rectangle + Top Outline) */}
             <Path
               data={`M 0 ${params.baseHeight * scale} L 0 0 A ${radius * scale} ${radius * scale} 0 0 1 ${params.width * scale} 0 L ${params.width * scale} ${params.baseHeight * scale} Z`}
-              stroke="#334155"
+              stroke={strokeColor}
               strokeWidth={2}
-              fill="#e2e8f0"
+              fill={mainFill}
             />
 
             {/* 3. The Shackle Hole */}
@@ -83,9 +120,9 @@ const PadeyeDraft = ({
               x={radius * scale}
               y={0}
               radius={holeRadius * scale}
-              stroke="#334155"
+              stroke={strokeColor}
               strokeWidth={2}
-              fill="white"
+              fill={holeFill}
             />
 
             {/* 4. The Cheek Plate */}
@@ -93,30 +130,64 @@ const PadeyeDraft = ({
               x={radius * scale}
               y={0}
               radius={cheekRadius * scale}
-              stroke="#334155"
+              stroke={strokeColor}
               strokeWidth={2}
             />
 
             {/* 5. Center Line / Crosshair Annotation */}
             <Line
               points={[radius * scale - 12, 0, radius * scale + 12, 0]}
-              stroke="#cbd5e1"
+              stroke={crosshairColor}
               strokeWidth={1.5}
             />
             <Line
               points={[radius * scale, -12, radius * scale, 12]}
-              stroke="#cbd5e1"
+              stroke={crosshairColor}
               strokeWidth={1.5}
             />
 
             {/* Dimension Label (Hole) */}
             <Text
-              text={`Ø ${params.holeDia}`}
-              x={radius * scale - 15}
+              text={`R3 = ${holeRadius}`}
+              x={radius * scale - 25}
               y={holeRadius * scale + 5}
               fontSize={12}
-              fill="#64748b"
+              fill={textColor}
             />
+
+            {/* Multileader for Main Plate */}
+            <Group>
+              <Arrow
+                points={[
+                  radius * scale - radius * scale * 0.707 - 30,
+                  -radius * scale * 0.707 - 30,
+                  radius * scale - radius * scale * 0.707,
+                  -radius * scale * 0.707,
+                ]}
+                stroke={textColor}
+                strokeWidth={1}
+                fill={textColor}
+                pointerLength={6}
+                pointerWidth={6}
+              />
+              <Line
+                points={[
+                  radius * scale - radius * scale * 0.707 - 30,
+                  -radius * scale * 0.707 - 30,
+                  radius * scale - radius * scale * 0.707 - 80,
+                  -radius * scale * 0.707 - 30,
+                ]}
+                stroke={textColor}
+                strokeWidth={1}
+              />
+              <Text
+                text={`R1 = ${radius}`}
+                x={radius * scale - radius * scale * 0.707 - 80}
+                y={-radius * scale * 0.707 - 45}
+                fontSize={12}
+                fill={textColor}
+              />
+            </Group>
 
             {/* Multileader for Cheek Plate */}
             <Group>
@@ -127,9 +198,9 @@ const PadeyeDraft = ({
                   radius * scale + cheekRadius * scale * 0.707,
                   -cheekRadius * scale * 0.707,
                 ]}
-                stroke="#64748b"
+                stroke={textColor}
                 strokeWidth={1}
-                fill="#64748b"
+                fill={textColor}
                 pointerLength={6}
                 pointerWidth={6}
               />
@@ -137,18 +208,18 @@ const PadeyeDraft = ({
                 points={[
                   radius * scale + cheekRadius * scale * 0.707 + 30,
                   -cheekRadius * scale * 0.707 - 30,
-                  radius * scale + cheekRadius * scale * 0.707 + 60,
+                  radius * scale + cheekRadius * scale * 0.707 + 80,
                   -cheekRadius * scale * 0.707 - 30,
                 ]}
-                stroke="#64748b"
+                stroke={textColor}
                 strokeWidth={1}
               />
               <Text
-                text={`Cheek Ø ${params.cheekDia}`}
+                text={`R2 = ${cheekRadius}`}
                 x={radius * scale + cheekRadius * scale * 0.707 + 30}
                 y={-cheekRadius * scale * 0.707 - 45}
                 fontSize={12}
-                fill="#64748b"
+                fill={textColor}
               />
             </Group>
 
@@ -160,7 +231,7 @@ const PadeyeDraft = ({
                 params.width * scale,
                 params.baseHeight * scale + 20,
               ]}
-              stroke="#64748b"
+              stroke={textColor}
               strokeWidth={1}
               pointerLength={6}
               pointerWidth={6}
@@ -174,7 +245,7 @@ const PadeyeDraft = ({
                 0,
                 params.baseHeight * scale + 24,
               ]}
-              stroke="#64748b"
+              stroke={textColor}
               strokeWidth={1}
             />
             <Line
@@ -184,7 +255,7 @@ const PadeyeDraft = ({
                 params.width * scale,
                 params.baseHeight * scale + 24,
               ]}
-              stroke="#64748b"
+              stroke={textColor}
               strokeWidth={1}
             />
             {/* Width label */}
@@ -193,7 +264,7 @@ const PadeyeDraft = ({
               x={(params.width * scale) / 2 - 40}
               y={params.baseHeight * scale + 25}
               fontSize={12}
-              fill="#64748b"
+              fill={textColor}
             />
 
             {/* --- Height Annotation (Base Height) --- */}
@@ -204,7 +275,7 @@ const PadeyeDraft = ({
                 params.width * scale + 20,
                 params.baseHeight * scale,
               ]}
-              stroke="#64748b"
+              stroke={textColor}
               strokeWidth={1}
               pointerLength={6}
               pointerWidth={6}
@@ -218,7 +289,7 @@ const PadeyeDraft = ({
                 params.width * scale + 24,
                 0,
               ]}
-              stroke="#64748b"
+              stroke={textColor}
               strokeWidth={1}
             />
             <Line
@@ -228,7 +299,7 @@ const PadeyeDraft = ({
                 params.width * scale + 24,
                 params.baseHeight * scale,
               ]}
-              stroke="#64748b"
+              stroke={textColor}
               strokeWidth={1}
             />
             {/* Height label */}
@@ -237,7 +308,7 @@ const PadeyeDraft = ({
               x={params.width * scale + 40}
               y={(params.baseHeight * scale) / 2 - 10}
               fontSize={12}
-              fill="#64748b"
+              fill={textColor}
               rotation={90}
             />
           </Group>

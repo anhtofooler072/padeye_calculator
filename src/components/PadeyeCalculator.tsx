@@ -25,6 +25,14 @@ function AppLayout() {
 
   const contextData = usePadeye();
 
+  const dimensionFailed =
+    !(contextData.pinClearance > 0) ||
+    !(contextData.sideClearance > 4) ||
+    !(contextData.shackleFit > 0) ||
+    !(contextData.cheekClearance > 0);
+
+  const strengthFailed = contextData.maxUC > 1.0;
+
   useEffect(() => {
     let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;
     if (!link) {
@@ -33,8 +41,8 @@ function AppLayout() {
       document.head.appendChild(link);
     }
 
-    if (contextData.maxUC) {
-      if (contextData.maxUC <= 1) {
+    if (contextData.maxUC !== undefined) {
+      if (!contextData.hasFailures) {
         link.href =
           "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✅</text></svg>";
         document.title = "✅ Padeye Check - PASS";
@@ -47,7 +55,7 @@ function AppLayout() {
       link.href = "/favicon.svg";
       document.title = "Padeye Check";
     }
-  }, [contextData.maxUC]);
+  }, [contextData.hasFailures, contextData.maxUC]);
 
   const links = [
     {
@@ -63,7 +71,14 @@ function AppLayout() {
     {
       label: "Dimension Check",
       icon: (
-        <Ruler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 shrink-0" />
+        <div className="relative">
+          <Ruler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 shrink-0" />
+          {dimensionFailed && (
+            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white ring-2 ring-neutral-50 dark:ring-neutral-900 leading-none">
+              !
+            </span>
+          )}
+        </div>
       ),
       onClick: () => {
         setActiveTab("Dimension Check");
@@ -73,7 +88,14 @@ function AppLayout() {
     {
       label: "Strength Check",
       icon: (
-        <Target className="text-neutral-700 dark:text-neutral-200 h-5 w-5 shrink-0" />
+        <div className="relative">
+          <Target className="text-neutral-700 dark:text-neutral-200 h-5 w-5 shrink-0" />
+          {strengthFailed && (
+            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white ring-2 ring-neutral-50 dark:ring-neutral-900 leading-none">
+              !
+            </span>
+          )}
+        </div>
       ),
       onClick: () => {
         setActiveTab("Strength Check");
@@ -83,7 +105,14 @@ function AppLayout() {
     {
       label: "Conclusion",
       icon: (
-        <CheckSquare className="text-neutral-700 dark:text-neutral-200 h-5 w-5 shrink-0" />
+        <div className="relative">
+          <CheckSquare className="text-neutral-700 dark:text-neutral-200 h-5 w-5 shrink-0" />
+          {contextData.hasFailures && (
+            <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white ring-2 ring-neutral-50 dark:ring-neutral-900 leading-none">
+              !
+            </span>
+          )}
+        </div>
       ),
       onClick: () => {
         setActiveTab("Conclusion");
@@ -249,6 +278,8 @@ function AppLayout() {
                     maxUC={contextData.maxUC}
                     governingUC={contextData.governingUC}
                     selectedMaterial={contextData.selectedMaterial}
+                    frontViewImage={contextData.frontViewDataURL}
+                    sideViewImage={contextData.sideViewDataURL}
                   />
                 }
                 fileName="Padeye_Calculation_Report.pdf"
@@ -276,6 +307,8 @@ function AppLayout() {
                 maxUC={contextData.maxUC}
                 governingUC={contextData.governingUC}
                 selectedMaterial={contextData.selectedMaterial}
+                frontViewImage={contextData.frontViewDataURL}
+                sideViewImage={contextData.sideViewDataURL}
               />
             </PDFViewer>
           </div>

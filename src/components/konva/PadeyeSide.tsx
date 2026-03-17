@@ -1,3 +1,4 @@
+import { useRef, useEffect } from "react";
 import {
   Stage,
   Layer,
@@ -10,6 +11,7 @@ import {
   Circle,
   Arrow,
 } from "react-konva";
+import { useTheme } from "../theme-provider";
 
 interface PadeyeParams {
   width: number;
@@ -27,10 +29,34 @@ interface PadeyeParams {
 const PadeyeSide = ({
   params,
   padCanvas,
+  onImageReady,
 }: {
   params: PadeyeParams;
   padCanvas: number;
+  onImageReady?: (url: string) => void;
 }) => {
+  const { theme } = useTheme();
+  const stageRef = useRef<any>(null);
+
+  const isDark =
+    theme === "dark" ||
+    (theme === "system" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  // Colors
+  const strokeColor = isDark ? "#94a3b8" : "#334155";
+  const mainFill = isDark ? "#334155" : "#e2e8f0";
+  const cheekFill = isDark ? "#475569" : "#cbd5e1";
+  const textColor = isDark ? "#94a3b8" : "#64748b";
+  const centerLineColor = isDark ? "#475569" : "#94a3b8";
+  const shackleColor = isDark ? "#fbbf24" : "#f59e0b";
+  const shackleTextColor = isDark ? "#fbbf24" : "#d97706";
+  const slingColor = isDark ? "#34d399" : "#10b981";
+  const canvasBgClass = isDark
+    ? "bg-neutral-900 border-neutral-800"
+    : "bg-white border-slate-200";
+
   const PAD_CANVAS = padCanvas; // px
 
   // Derived dimensions to match exact front view scale
@@ -102,11 +128,23 @@ const PadeyeSide = ({
     ? holeCenterY * scale + 45
     : cheekOffsetY * scale - 25;
 
+  // Render to DataURL whenever params or layout changes
+  useEffect(() => {
+    if (onImageReady && stageRef.current) {
+      setTimeout(() => {
+        if (stageRef.current) {
+          onImageReady(stageRef.current.toDataURL({ pixelRatio: 2 }));
+        }
+      }, 500);
+    }
+  }, [params, PAD_CANVAS, onImageReady, theme, isDark]);
+
   return (
-    <div className="bg-white p-4 rounded shadow-inner border border-slate-200">
+    <div className={`p-4 rounded shadow-inner border ${canvasBgClass}`}>
       <Stage
         width={PAD_CANVAS}
-        height={PAD_CANVAS}>
+        height={PAD_CANVAS}
+        ref={stageRef}>
         <Layer>
           <Group
             x={offsetX}
@@ -117,9 +155,9 @@ const PadeyeSide = ({
               y={cheekOffsetY * scale}
               width={params.cheekThk * scale}
               height={cheekHeight * scale}
-              stroke="#334155"
+              stroke={strokeColor}
               strokeWidth={2}
-              fill="#cbd5e1" // Light green
+              fill={cheekFill} // Light green
             />
 
             {/* Main Plate */}
@@ -128,9 +166,9 @@ const PadeyeSide = ({
               y={0}
               width={params.mainThk * scale}
               height={mainHeight * scale}
-              stroke="#334155"
+              stroke={strokeColor}
               strokeWidth={2}
-              fill="#e2e8f0" // Light red / pinkish
+              fill={mainFill} // Light red / pinkish
             />
 
             {/* Right Cheek Plate */}
@@ -139,9 +177,9 @@ const PadeyeSide = ({
               y={cheekOffsetY * scale}
               width={params.cheekThk * scale}
               height={cheekHeight * scale}
-              stroke="#334155"
+              stroke={strokeColor}
               strokeWidth={2}
-              fill="#cbd5e1" // Light green
+              fill={cheekFill} // Light green
             />
 
             {/* --- Shackle Overlay --- */}
@@ -158,7 +196,7 @@ const PadeyeSide = ({
                     (params.shackleA! + 2 * shackleEarThickness + 20) * scale
                   }
                   height={params.shackleB! * scale}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={2}
                   dash={[5, 5]}
                   fill="transparent"
@@ -170,7 +208,7 @@ const PadeyeSide = ({
                          L ${(cx - params.shackleA! / 2) * scale} ${(innerBowTopY + params.shackleA! / 2) * scale} 
                          A ${(params.shackleA! / 2) * scale} ${(params.shackleA! / 2) * scale} 0 0 1 ${(cx + params.shackleA! / 2) * scale} ${(innerBowTopY + params.shackleA! / 2) * scale} 
                          L ${(cx + params.shackleA! / 2) * scale} ${earBottomY * scale}`}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={2}
                   dash={[5, 5]}
                   fill="transparent"
@@ -181,7 +219,7 @@ const PadeyeSide = ({
                   x={cx * scale}
                   y={(innerBowTopY + slingR + 2) * scale}
                   radius={slingR * scale}
-                  stroke="#10b981"
+                  stroke={slingColor}
                   strokeWidth={2}
                   dash={[4, 4]}
                   fill="transparent"
@@ -193,10 +231,10 @@ const PadeyeSide = ({
                     cx * scale,
                     (innerBowTopY + slingR + 2) * scale,
                     cx * scale,
-                    (innerBowTopY + slingR + 2) * scale - 90,
+                    (innerBowTopY + slingR + 2) * scale - 55,
                   ]}
-                  stroke="#10b981"
-                  fill="#10b981"
+                  stroke={slingColor}
+                  fill={slingColor}
                   strokeWidth={2}
                   pointerLength={8}
                   pointerWidth={8}
@@ -208,7 +246,7 @@ const PadeyeSide = ({
                          L ${(cx - params.shackleA! / 2 - shackleEarThickness) * scale} ${(innerBowTopY + params.shackleA! / 2) * scale} 
                          A ${(params.shackleA! / 2 + shackleEarThickness) * scale} ${(params.shackleA! / 2 + shackleEarThickness) * scale} 0 0 1 ${(cx + params.shackleA! / 2 + shackleEarThickness) * scale} ${(innerBowTopY + params.shackleA! / 2) * scale} 
                          L ${(cx + params.shackleA! / 2 + shackleEarThickness) * scale} ${earBottomY * scale}`}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={2}
                   dash={[5, 5]}
                   fill="transparent"
@@ -222,7 +260,7 @@ const PadeyeSide = ({
                     (cx - params.shackleA! / 2) * scale,
                     earBottomY * scale,
                   ]}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={2}
                   dash={[5, 5]}
                 />
@@ -233,7 +271,7 @@ const PadeyeSide = ({
                     (cx + params.shackleA! / 2 + shackleEarThickness) * scale,
                     earBottomY * scale,
                   ]}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={2}
                   dash={[5, 5]}
                 />
@@ -246,7 +284,7 @@ const PadeyeSide = ({
                     (cx - params.shackleA! / 2) * scale,
                     (annLabelY + 5) * scale,
                   ]}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={1}
                   dash={[2, 2]}
                 />
@@ -257,7 +295,7 @@ const PadeyeSide = ({
                     (cx + params.shackleA! / 2) * scale,
                     (annLabelY + 5) * scale,
                   ]}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={1}
                   dash={[2, 2]}
                 />
@@ -268,7 +306,7 @@ const PadeyeSide = ({
                     (cx + params.shackleA! / 2) * scale,
                     annLabelY * scale,
                   ]}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={1}
                   pointerLength={4}
                   pointerWidth={4}
@@ -279,7 +317,7 @@ const PadeyeSide = ({
                   x={(cx - params.shackleA! / 2) * scale - 75}
                   y={annLabelY * scale - 5}
                   fontSize={11}
-                  fill="#d97706"
+                  fill={shackleTextColor}
                 />
 
                 {/* Arrow connecting the A Text to the Dimension Line */}
@@ -290,8 +328,8 @@ const PadeyeSide = ({
                     (cx - params.shackleA! / 2) * scale,
                     annLabelY * scale,
                   ]}
-                  stroke="#f59e0b"
-                  fill="#f59e0b"
+                  stroke={shackleColor}
+                  fill={shackleColor}
                   strokeWidth={1}
                   pointerLength={5}
                   pointerWidth={4}
@@ -306,7 +344,7 @@ const PadeyeSide = ({
                       scale,
                     innerBowTopY * scale,
                   ]}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={1}
                   dash={[2, 2]}
                 />
@@ -319,7 +357,7 @@ const PadeyeSide = ({
                       scale,
                     (holeCenterY - params.shackleB! / 2) * scale,
                   ]}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={1}
                   dash={[2, 2]}
                 />
@@ -332,7 +370,7 @@ const PadeyeSide = ({
                       scale,
                     innerBowTopY * scale,
                   ]}
-                  stroke="#f59e0b"
+                  stroke={shackleColor}
                   strokeWidth={1}
                   pointerLength={4}
                   pointerWidth={4}
@@ -350,7 +388,7 @@ const PadeyeSide = ({
                     8
                   }
                   fontSize={11}
-                  fill="#d97706"
+                  fill={shackleTextColor}
                 />
               </Group>
             )}
@@ -363,7 +401,7 @@ const PadeyeSide = ({
                 totalDrawingWidthSide * scale + 30,
                 holeCenterY * scale,
               ]}
-              stroke="#94a3b8"
+              stroke={centerLineColor}
               strokeWidth={1.5}
               dash={[20, 6, 4, 6]}
             />
@@ -379,21 +417,21 @@ const PadeyeSide = ({
                   leftLeaderX,
                   -35,
                 ]}
-                stroke="#64748b"
+                stroke={textColor}
                 strokeWidth={1}
               />
               <Circle
                 x={(params.cheekThk + params.mainThk / 2) * scale}
                 y={15}
                 radius={2.5}
-                fill="#64748b"
+                fill={textColor}
               />
               <Text
                 text={`THK.${params.mainThk}`}
                 x={leftLeaderX}
                 y={-50}
                 fontSize={11}
-                fill="#64748b"
+                fill={textColor}
               />
             </Group>
 
@@ -408,21 +446,21 @@ const PadeyeSide = ({
                   rightLeaderEndX,
                   rightLeaderY,
                 ]}
-                stroke="#64748b"
+                stroke={textColor}
                 strokeWidth={1}
               />
               <Circle
                 x={(params.cheekThk * 1.5 + params.mainThk) * scale}
                 y={cheekOffsetY * scale + 15}
                 radius={2.5}
-                fill="#64748b"
+                fill={textColor}
               />
               <Text
                 text={`THK.${params.cheekThk}`}
                 x={rightLeaderTextX}
                 y={rightLeaderY - 15}
                 fontSize={11}
-                fill="#64748b"
+                fill={textColor}
               />
             </Group>
 
@@ -434,7 +472,7 @@ const PadeyeSide = ({
                 totalDrawingWidthSide * scale,
                 mainHeight * scale + 20,
               ]}
-              stroke="#64748b"
+              stroke={textColor}
               strokeWidth={1}
               pointerLength={6}
               pointerWidth={6}
@@ -442,7 +480,7 @@ const PadeyeSide = ({
             />
             <Line
               points={[0, mainHeight * scale + 16, 0, mainHeight * scale + 24]}
-              stroke="#64748b"
+              stroke={textColor}
               strokeWidth={1}
             />
             <Line
@@ -452,7 +490,7 @@ const PadeyeSide = ({
                 totalDrawingWidthSide * scale,
                 mainHeight * scale + 24,
               ]}
-              stroke="#64748b"
+              stroke={textColor}
               strokeWidth={1}
             />
             <Text
@@ -460,7 +498,7 @@ const PadeyeSide = ({
               x={(totalDrawingWidthSide * scale) / 2 - 50}
               y={mainHeight * scale + 30}
               fontSize={12}
-              fill="#64748b"
+              fill={textColor}
             />
           </Group>
         </Layer>

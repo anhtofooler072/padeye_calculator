@@ -32,6 +32,9 @@ export function usePadeyeLogic() {
   const [selectedShackle, setSelectedShackle] = useState("13-1/2T");
   const [selectedSling, setSelectedSling] = useState("42");
 
+  const [frontViewDataURL, setFrontViewDataURL] = useState<string>("");
+  const [sideViewDataURL, setSideViewDataURL] = useState<string>("");
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInputs((prev) => ({
@@ -204,6 +207,10 @@ export function usePadeyeLogic() {
     maxUC,
     governingUC,
     hasFailures,
+    frontViewDataURL,
+    setFrontViewDataURL,
+    sideViewDataURL,
+    setSideViewDataURL,
   };
 }
 

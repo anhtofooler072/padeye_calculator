@@ -1,5 +1,6 @@
 import PadeyeDraft from "./Padeye";
 import PadeyeSide from "./PadeyeSide";
+import { usePadeye } from "../calculator/PadeyeContext";
 
 interface PadeyeParams {
   width: number;
@@ -25,6 +26,8 @@ export default function CombinedPadeye({
   padCanvas,
   constraint = true,
 }: CombinedPadeyeProps) {
+  const { setFrontViewDataURL, setSideViewDataURL } = usePadeye();
+
   const mergedParams = {
     shackleA: 80,
     shackleB: 38.1,
@@ -40,12 +43,13 @@ export default function CombinedPadeye({
 
   return (
     <div className="flex flex-col items-center w-full gap-6">
-      <div className="flex flex-row gap-10 items-center justify-center w-full">
+      <div className="flex flex-col md:flex-row gap-8 items-center justify-center w-full">
         <div className="flex flex-col items-center">
           <span className="text-slate-600 font-semibold mb-3">Front View</span>
           <PadeyeDraft
             params={mergedParams}
             padCanvas={padCanvas}
+            onImageReady={setFrontViewDataURL}
           />
         </div>
         <div className="flex flex-col items-center">
@@ -53,6 +57,7 @@ export default function CombinedPadeye({
           <PadeyeSide
             params={mergedParams}
             padCanvas={padCanvas}
+            onImageReady={setSideViewDataURL}
           />
         </div>
       </div>

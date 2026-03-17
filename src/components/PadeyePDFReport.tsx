@@ -4,7 +4,7 @@ import {
   Text,
   View,
   StyleSheet,
-  
+  Image,
 } from "@react-pdf/renderer";
 
 // Create styles
@@ -84,6 +84,28 @@ const styles = StyleSheet.create({
     color: "#555",
     marginBottom: 5,
   },
+  drawingContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  drawingBox: {
+    width: "48%",
+    alignItems: "center",
+  },
+  drawingTitle: {
+    fontSize: 10,
+    fontWeight: "bold",
+    marginBottom: 5,
+    color: "#555",
+  },
+  drawingImage: {
+    width: "100%",
+    height: 180,
+    objectFit: "contain",
+  },
 });
 
 interface ReportProps {
@@ -94,6 +116,8 @@ interface ReportProps {
   maxUC: number;
   governingUC: any;
   selectedMaterial: string;
+  frontViewImage?: string;
+  sideViewImage?: string;
 }
 
 export const PadeyePDFReport = ({
@@ -104,6 +128,8 @@ export const PadeyePDFReport = ({
   maxUC,
   governingUC,
   selectedMaterial,
+  frontViewImage,
+  sideViewImage,
 }: ReportProps) => {
   const isSafe = maxUC <= 1.0;
 
@@ -190,6 +216,32 @@ export const PadeyePDFReport = ({
             </Text>
           </View>
         </View>
+
+        {(frontViewImage || sideViewImage) && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>TECHNICAL DRAWINGS</Text>
+            <View style={styles.drawingContainer}>
+              {frontViewImage && (
+                <View style={styles.drawingBox}>
+                  <Text style={styles.drawingTitle}>FRONT VIEW</Text>
+                  <Image
+                    style={styles.drawingImage}
+                    src={frontViewImage}
+                  />
+                </View>
+              )}
+              {sideViewImage && (
+                <View style={styles.drawingBox}>
+                  <Text style={styles.drawingTitle}>SIDE VIEW</Text>
+                  <Image
+                    style={styles.drawingImage}
+                    src={sideViewImage}
+                  />
+                </View>
+              )}
+            </View>
+          </View>
+        )}
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>SHACKLE & CLEARANCES</Text>
