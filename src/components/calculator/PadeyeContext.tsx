@@ -3,6 +3,7 @@ import materials from "@/data/materials.json";
 import shackles from "@/data/shackles.json";
 import slings from "@/data/slings.json";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const initialInputs = {
   SLp: 11397,
   n: 1.5,
@@ -24,6 +25,7 @@ export const initialInputs = {
   h_wm: 6,
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function usePadeyeLogic() {
   const [inputs, setInputs] = useState(initialInputs);
   const [selectedMaterial, setSelectedMaterial] = useState("SS400");
@@ -215,6 +217,7 @@ export const PadeyeProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const usePadeye = () => {
   const context = useContext(PadeyeContext);
   if (!context) throw new Error("usePadeye must be used within PadeyeProvider");
