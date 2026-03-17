@@ -1,6 +1,6 @@
 import { useState } from "react";
 import CombinedPadeye from "../components/konva/CombinedPadeye";
-import PadeyeConfig from "../components/PadeyeConfig";
+import PadeyeConfig from "../components/konva/PadeyeConfig";
 
 export default function Input() {
   const PAD_CANVAS = 520; // Shared canvas size for both views
