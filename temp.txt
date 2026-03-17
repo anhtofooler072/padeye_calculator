@@ -1,0 +1,9 @@
+  const totalDrawingWidthSide = params.cheekThk * 2 + params.mainThk;
+  const scaleX = maxDrawingSize / totalDrawingWidth;
+  const scaledWidth = totalDrawingWidth * scale;
+                totalDrawingWidth * scale + 30,
+                totalDrawingWidthSide * scale,
+                totalDrawingWidthSide * scale,
+                totalDrawingWidthSide * scale,
+              text={`Total Thickness: ${totalDrawingWidthSide} mm`}
+              x={(totalDrawingWidthSide * scale) / 2 - 50}
