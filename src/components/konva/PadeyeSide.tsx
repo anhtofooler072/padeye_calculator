@@ -187,6 +187,21 @@ const PadeyeSide = ({
                   fill="transparent"
                 />
 
+                {/* Sling Load Arrow */}
+                <Arrow
+                  points={[
+                    cx * scale,
+                    (innerBowTopY + slingR + 2) * scale,
+                    cx * scale,
+                    (innerBowTopY + slingR + 2) * scale - 90,
+                  ]}
+                  stroke="#10b981"
+                  fill="#10b981"
+                  strokeWidth={2}
+                  pointerLength={8}
+                  pointerWidth={8}
+                />
+
                 {/* Outer edge of Shackle Ear & Body */}
                 <Path
                   data={`M ${(cx - params.shackleA! / 2 - shackleEarThickness) * scale} ${earBottomY * scale} 
