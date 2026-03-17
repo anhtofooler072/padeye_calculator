@@ -29,7 +29,8 @@ export function InputSection() {
   } = usePadeye();
 
   const padeyeParams = {
-    width: inputs.R1 * 2,
+    width: inputs.L || inputs.R1 * 2,
+    r1: inputs.R1,
     baseHeight: inputs.H,
     holeDia: inputs.R3 * 2,
     cheekDia: inputs.R2 * 2,

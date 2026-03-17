@@ -15,6 +15,7 @@ import { useTheme } from "../theme-provider";
 interface PadeyeParams {
   width: number;
   baseHeight: number;
+  r1?: number;
   holeDia: number;
   cheekDia: number;
   mainThk: number;
@@ -51,7 +52,8 @@ const PadeyeDraft = ({
     : "bg-white border-slate-200";
 
   // Derived Values
-  const radius = params.width / 2;
+  const cx = params.width / 2;
+  const radius = params.r1 || params.width / 2;
   const holeRadius = params.holeDia / 2;
   const cheekRadius = params.cheekDia / 2;
 
@@ -110,7 +112,7 @@ const PadeyeDraft = ({
             y={offsetY}>
             {/* 1 & 2. The Main Padeye Body (Combined Rectangle + Top Outline) */}
             <Path
-              data={`M 0 ${params.baseHeight * scale} L 0 0 A ${radius * scale} ${radius * scale} 0 0 1 ${params.width * scale} 0 L ${params.width * scale} ${params.baseHeight * scale} Z`}
+              data={`M 0 ${params.baseHeight * scale} L ${(cx - radius) * scale} 0 A ${radius * scale} ${radius * scale} 0 0 1 ${(cx + radius) * scale} 0 L ${params.width * scale} ${params.baseHeight * scale} Z`}
               stroke={strokeColor}
               strokeWidth={2}
               fill={mainFill}
@@ -118,7 +120,7 @@ const PadeyeDraft = ({
 
             {/* 3. The Shackle Hole */}
             <Circle
-              x={radius * scale}
+              x={cx * scale}
               y={0}
               radius={holeRadius * scale}
               stroke={strokeColor}
@@ -128,7 +130,7 @@ const PadeyeDraft = ({
 
             {/* 4. The Cheek Plate */}
             <Circle
-              x={radius * scale}
+              x={cx * scale}
               y={0}
               radius={cheekRadius * scale}
               stroke={strokeColor}
@@ -137,12 +139,12 @@ const PadeyeDraft = ({
 
             {/* 5. Center Line / Crosshair Annotation */}
             <Line
-              points={[radius * scale - 12, 0, radius * scale + 12, 0]}
+              points={[cx * scale - 12, 0, cx * scale + 12, 0]}
               stroke={crosshairColor}
               strokeWidth={1.5}
             />
             <Line
-              points={[radius * scale, -12, radius * scale, 12]}
+              points={[cx * scale, -12, cx * scale, 12]}
               stroke={crosshairColor}
               strokeWidth={1.5}
             />
@@ -150,7 +152,7 @@ const PadeyeDraft = ({
             {/* Dimension Label (Hole) */}
             <Text
               text={`R3 = ${holeRadius}`}
-              x={radius * scale - 25}
+              x={cx * scale - 25}
               y={holeRadius * scale + 5}
               fontSize={12}
               fill={textColor}
@@ -160,9 +162,9 @@ const PadeyeDraft = ({
             <Group>
               <Arrow
                 points={[
-                  radius * scale - radius * scale * 0.707 - 30,
+                  cx * scale - radius * scale * 0.707 - 30,
                   -radius * scale * 0.707 - 30,
-                  radius * scale - radius * scale * 0.707,
+                  cx * scale - radius * scale * 0.707,
                   -radius * scale * 0.707,
                 ]}
                 stroke={textColor}
@@ -173,9 +175,9 @@ const PadeyeDraft = ({
               />
               <Line
                 points={[
-                  radius * scale - radius * scale * 0.707 - 30,
+                  cx * scale - radius * scale * 0.707 - 30,
                   -radius * scale * 0.707 - 30,
-                  radius * scale - radius * scale * 0.707 - 80,
+                  cx * scale - radius * scale * 0.707 - 80,
                   -radius * scale * 0.707 - 30,
                 ]}
                 stroke={textColor}
@@ -183,7 +185,7 @@ const PadeyeDraft = ({
               />
               <Text
                 text={`R1 = ${radius}`}
-                x={radius * scale - radius * scale * 0.707 - 80}
+                x={cx * scale - radius * scale * 0.707 - 80}
                 y={-radius * scale * 0.707 - 45}
                 fontSize={12}
                 fill={textColor}
@@ -194,9 +196,9 @@ const PadeyeDraft = ({
             <Group>
               <Arrow
                 points={[
-                  radius * scale + cheekRadius * scale * 0.707 + 30,
+                  cx * scale + cheekRadius * scale * 0.707 + 30,
                   -cheekRadius * scale * 0.707 - 30,
-                  radius * scale + cheekRadius * scale * 0.707,
+                  cx * scale + cheekRadius * scale * 0.707,
                   -cheekRadius * scale * 0.707,
                 ]}
                 stroke={textColor}
@@ -207,9 +209,9 @@ const PadeyeDraft = ({
               />
               <Line
                 points={[
-                  radius * scale + cheekRadius * scale * 0.707 + 30,
+                  cx * scale + cheekRadius * scale * 0.707 + 30,
                   -cheekRadius * scale * 0.707 - 30,
-                  radius * scale + cheekRadius * scale * 0.707 + 80,
+                  cx * scale + cheekRadius * scale * 0.707 + 80,
                   -cheekRadius * scale * 0.707 - 30,
                 ]}
                 stroke={textColor}
@@ -217,7 +219,7 @@ const PadeyeDraft = ({
               />
               <Text
                 text={`R2 = ${cheekRadius}`}
-                x={radius * scale + cheekRadius * scale * 0.707 + 30}
+                x={cx * scale + cheekRadius * scale * 0.707 + 30}
                 y={-cheekRadius * scale * 0.707 - 45}
                 fontSize={12}
                 fill={textColor}

@@ -15,7 +15,7 @@ export const initialInputs = {
   t1: 30,
   t2: 10,
   H: 90,
-  L: 250,
+  L: 180,
   alpha: 61,
   B: 38.1,
   C: 133,

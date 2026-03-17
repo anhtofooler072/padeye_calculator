@@ -17,6 +17,7 @@ import { useTheme } from "../theme-provider";
 interface PadeyeParams {
   width: number;
   baseHeight: number;
+  r1?: number;
   holeDia: number;
   cheekDia: number;
   mainThk: number;
@@ -61,7 +62,7 @@ const PadeyeSide = ({
   const PAD_CANVAS = padCanvas; // px
 
   // Derived dimensions to match exact front view scale
-  const radius = params.width / 2;
+  const radius = params.r1 || params.width / 2;
   const mainHeight = params.baseHeight + radius;
   const cheekHeight = params.cheekDia;
 

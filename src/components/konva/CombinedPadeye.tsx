@@ -5,6 +5,7 @@ import { usePadeye } from "../calculator/PadeyeContext";
 interface PadeyeParams {
   width: number;
   baseHeight: number;
+  r1?: number;
   holeDia: number;
   cheekDia: number;
   mainThk: number;
