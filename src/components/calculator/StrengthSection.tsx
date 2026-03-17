@@ -29,7 +29,7 @@ export function StrengthSection() {
       <Card className="shadow-sm border-border/50">
         <CardHeader className="pb-3 border-b border-border/50">
           <CardTitle className="text-lg font-bold">
-            2. Strength Unity Checks
+            Strength Unity Checks
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-4 flex flex-col gap-6">

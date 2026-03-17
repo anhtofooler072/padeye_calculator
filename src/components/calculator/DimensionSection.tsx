@@ -21,7 +21,7 @@ export function DimensionSection() {
       <Card className="shadow-sm border-border/50">
         <CardHeader className="pb-3 border-b border-border/50">
           <CardTitle className="text-lg font-bold">
-            1. Dimension & Clearance Checks
+            Dimension & Clearance Checks
           </CardTitle>
         </CardHeader>
         <CardContent className="pt-4 grid grid-cols-1 md:grid-cols-2 gap-3">

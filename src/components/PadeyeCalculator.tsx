@@ -31,28 +31,40 @@ function AppLayout() {
       icon: (
         <Calculator className="text-neutral-700 dark:text-neutral-200 h-5 w-5 shrink-0" />
       ),
-      onClick: () => setActiveTab("Input"),
+      onClick: () => {
+        setActiveTab("Input");
+        if (window.innerWidth < 768) setOpen(false);
+      },
     },
     {
       label: "Dimension Check",
       icon: (
         <Ruler className="text-neutral-700 dark:text-neutral-200 h-5 w-5 shrink-0" />
       ),
-      onClick: () => setActiveTab("Dimension Check"),
+      onClick: () => {
+        setActiveTab("Dimension Check");
+        if (window.innerWidth < 768) setOpen(false);
+      },
     },
     {
       label: "Strength Check",
       icon: (
         <Target className="text-neutral-700 dark:text-neutral-200 h-5 w-5 shrink-0" />
       ),
-      onClick: () => setActiveTab("Strength Check"),
+      onClick: () => {
+        setActiveTab("Strength Check");
+        if (window.innerWidth < 768) setOpen(false);
+      },
     },
     {
       label: "Conclusion",
       icon: (
         <CheckSquare className="text-neutral-700 dark:text-neutral-200 h-5 w-5 shrink-0" />
       ),
-      onClick: () => setActiveTab("Conclusion"),
+      onClick: () => {
+        setActiveTab("Conclusion");
+        if (window.innerWidth < 768) setOpen(false);
+      },
     },
   ];
 
