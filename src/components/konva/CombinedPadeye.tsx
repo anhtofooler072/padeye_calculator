@@ -17,11 +17,13 @@ interface PadeyeParams {
 interface CombinedPadeyeProps {
   params: PadeyeParams;
   padCanvas: number;
+  constraint?: boolean;
 }
 
 export default function CombinedPadeye({
   params,
   padCanvas,
+  constraint = true,
 }: CombinedPadeyeProps) {
   const mergedParams = {
     shackleA: 80,
@@ -55,7 +57,7 @@ export default function CombinedPadeye({
         </div>
       </div>
 
-      {(!isJawWidthValid || !isThicknessValid) && (
+      {constraint && (!isJawWidthValid || !isThicknessValid) && (
         <div className="text-amber-700 bg-amber-50 p-3 rounded-md text-center text-sm font-medium border border-amber-200 max-w-2xl mx-auto shadow-sm">
           ⚠️ <strong>Clearance Constraint Warning:</strong>
           {!isJawWidthValid &&
