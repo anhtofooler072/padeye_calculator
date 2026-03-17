@@ -9,6 +9,7 @@ import {
   Text,
   Arrow,
 } from "react-konva";
+import Konva from "konva";
 import { useTheme } from "../theme-provider";
 
 interface PadeyeParams {
@@ -30,7 +31,7 @@ const PadeyeDraft = ({
   onImageReady?: (url: string) => void;
 }) => {
   const { theme } = useTheme();
-  const stageRef = useRef<any>(null);
+  const stageRef = useRef<Konva.Stage>(null);
 
   // We determine if it's dark mode either if explicitly 'dark' or if 'system' resolves to 'dark'
   const isDark =

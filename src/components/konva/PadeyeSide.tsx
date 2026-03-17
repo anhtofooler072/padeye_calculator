@@ -11,6 +11,7 @@ import {
   Circle,
   Arrow,
 } from "react-konva";
+import Konva from "konva";
 import { useTheme } from "../theme-provider";
 
 interface PadeyeParams {
@@ -36,7 +37,7 @@ const PadeyeSide = ({
   onImageReady?: (url: string) => void;
 }) => {
   const { theme } = useTheme();
-  const stageRef = useRef<any>(null);
+  const stageRef = useRef<Konva.Stage>(null);
 
   const isDark =
     theme === "dark" ||
