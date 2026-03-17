@@ -5,7 +5,7 @@ import slings from "@/data/slings.json";
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const initialInputs = {
-  SLp: 11397,
+  SLp: 9000,
   n: 1.5,
   Fy: 245,
   Fu: 400,
