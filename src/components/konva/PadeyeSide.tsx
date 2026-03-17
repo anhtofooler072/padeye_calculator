@@ -78,14 +78,10 @@ const PadeyeSide = ({
     holeCenterY -
     (params.shackleB ? params.shackleB / 2 : 0) -
     (params.shackleC || 0);
-  const outerBowTopY = innerBowTopY - shackleEarThickness;
   const slingR =
     (params.slingD || (params.shackleB ? params.shackleB * 0.8 : 0)) / 2;
 
   // Dynamic offset for plate top annotations
-  const topOfDrawing = hasShackle ? Math.min(0, outerBowTopY) : 0;
-  const annY1 = topOfDrawing - 30; // Main plate Y
-  const annY2 = topOfDrawing - 55; // Cheek plate Y
   const annLabelY = earBottomY + 25; // A/Clearance Label Y
 
   // Dynamic X offsets for multileaders to avoid shackle and sling
@@ -102,6 +98,9 @@ const PadeyeSide = ({
       )
     : totalDrawingWidthSide * scale + 70;
   const rightLeaderTextX = rightLeaderEndX - 40;
+  const rightLeaderY = hasShackle
+    ? holeCenterY * scale + 45
+    : cheekOffsetY * scale - 25;
 
   return (
     <div className="bg-white p-4 rounded shadow-inner border border-slate-200">
@@ -390,9 +389,9 @@ const PadeyeSide = ({
                   (params.cheekThk * 1.5 + params.mainThk) * scale,
                   cheekOffsetY * scale + 15,
                   totalDrawingWidthSide * scale + 30,
-                  cheekOffsetY * scale - 25,
+                  rightLeaderY,
                   rightLeaderEndX,
-                  cheekOffsetY * scale - 25,
+                  rightLeaderY,
                 ]}
                 stroke="#64748b"
                 strokeWidth={1}
@@ -406,7 +405,7 @@ const PadeyeSide = ({
               <Text
                 text={`THK.${params.cheekThk}`}
                 x={rightLeaderTextX}
-                y={cheekOffsetY * scale - 40}
+                y={rightLeaderY - 15}
                 fontSize={11}
                 fill="#64748b"
               />
